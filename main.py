@@ -418,6 +418,8 @@ async def get_registrations(db: Session = Depends(get_db)):
         ]
     }
 
+# 不允许删除已验证的团队
+'''
 # 使用用户名删除接口
 @app.delete("/delete/member/{username}")
 async def delete_registration(username: str, db: Session = Depends(get_db)):
@@ -435,6 +437,7 @@ async def delete_registration(username: str, db: Session = Depends(get_db)):
         "status": "success", 
         "message": f"用户 {username} 的注册信息已删除"
     }
+'''
 
 # 获取团队成员信息
 @app.get("/api/team/{username}/members")
