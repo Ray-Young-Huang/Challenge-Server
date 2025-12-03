@@ -308,8 +308,8 @@
                 
                 alert('🎉 注册成功！\n\n团队名称：' + result.data.teamName + '\n用户名：' + result.data.username);
                 
-                // 跳转到登录页或首页
-                window.location.href = '/register'; // 可以改为登录页
+                // 跳转到登录页
+                window.location.href = '/login';
                 
             } catch (error) {
                 console.error('验证错误:', error);

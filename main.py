@@ -1,9 +1,10 @@
 from fastapi import FastAPI, HTTPException, Depends
 from fastapi.responses import HTMLResponse
 from pydantic import BaseModel, EmailStr
-from typing import List
+from typing import List, Optional
 from sqlalchemy.orm import Session
 from datetime import datetime, timedelta
+import secrets
 
 # 导入数据库相关
 from database import init_db, get_db, TeamRegistration, TeamMember, VerificationCode
@@ -43,6 +44,11 @@ class VerifyCodeData(BaseModel):
     email: EmailStr
     code: str
 
+class LoginData(BaseModel):
+    username: str
+    password: str
+    rememberMe: bool = False
+
 # 响应模型
 class MemberResponse(BaseModel):
     name: str
@@ -72,6 +78,12 @@ async def serve_registration_page():
 @app.get("/verify", response_class=HTMLResponse)
 async def serve_verification_page():
     with open("verify.html", "r", encoding="utf-8") as f:
+        return f.read()
+
+# 提供登录页面
+@app.get("/login", response_class=HTMLResponse)
+async def serve_login_page():
+    with open("login.html", "r", encoding="utf-8") as f:
         return f.read()
 
 # 第一步：接收注册数据，发送验证码
@@ -201,6 +213,40 @@ async def verify_code(data: VerifyCodeData, db: Session = Depends(get_db)):
             "email": db_team.email,
             "memberCount": len(db_team.members)
         }
+    }
+
+# 登录API
+@app.post("/api/login")
+async def login_user(data: LoginData, db: Session = Depends(get_db)):
+    # 查找用户（支持用户名或邮箱登录）
+    user = db.query(TeamRegistration).filter(
+        (TeamRegistration.username == data.username) | (TeamRegistration.email == data.username)
+    ).first()
+    
+    if not user:
+        raise HTTPException(status_code=401, detail="用户名或密码错误")
+    
+    # 检查用户是否已验证邮箱
+    if not user.is_verified:
+        raise HTTPException(status_code=403, detail="账户尚未验证，请先完成邮箱验证")
+    
+    # 验证密码（实际应用中应该使用哈希比对）
+    if user.password != data.password:
+        raise HTTPException(status_code=401, detail="用户名或密码错误")
+    
+    # 生成简单的token（实际应用中应该使用JWT）
+    token = secrets.token_urlsafe(32)
+    
+    return {
+        "status": "success",
+        "message": "登录成功",
+        "data": {
+            "username": user.username,
+            "teamName": user.teamName,
+            "email": user.email,
+            "organization": user.organization
+        },
+        "token": token
     }
 
 # 获取所有注册信息（管理接口） - 只显示已验证的
