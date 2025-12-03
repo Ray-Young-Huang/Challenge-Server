@@ -1,11 +1,12 @@
-from fastapi import FastAPI, HTTPException, Depends, status
-from fastapi.responses import HTMLResponse
+from fastapi import FastAPI, HTTPException, Depends, status, Request, Response
+from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from pydantic import BaseModel, EmailStr
 from typing import List, Optional
 from sqlalchemy.orm import Session
 from datetime import datetime, timedelta
 import secrets
+import uuid
 
 # 导入数据库相关
 from database import init_db, get_db, TeamRegistration, TeamMember, VerificationCode, Submission
@@ -16,21 +17,54 @@ from email_service import send_verification_email, generate_verification_code
 # 导入配置
 from config import DOCS_USERNAME, DOCS_PASSWORD
 
+# 存储一次性访问token (实际生产环境应使用Redis等缓存)
+# 格式: {token: {"username": str, "expires": datetime}}
+docs_tokens = {}
+
 # HTTP Basic 认证
-security = HTTPBasic()
+security = HTTPBasic(auto_error=False)
 
 def verify_docs_credentials(credentials: HTTPBasicCredentials = Depends(security)):
-    """验证文档访问凭证"""
+    """验证文档访问凭证并生成一次性token"""
+    if not credentials:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="文档访问需要认证",
+            headers={"WWW-Authenticate": 'Basic realm="API Documentation"'},
+        )
+    
     correct_username = secrets.compare_digest(credentials.username, DOCS_USERNAME)
     correct_password = secrets.compare_digest(credentials.password, DOCS_PASSWORD)
     
     if not (correct_username and correct_password):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="文档访问需要认证",
-            headers={"WWW-Authenticate": "Basic"},
+            detail="用户名或密码错误",
+            headers={"WWW-Authenticate": 'Basic realm="API Documentation"'},
         )
+    
     return credentials.username
+
+def verify_docs_token(request: Request):
+    """验证一次性访问token"""
+    token = request.query_params.get("token")
+    
+    if not token or token not in docs_tokens:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="未授权访问或token已失效，请重新认证",
+        )
+    
+    # 验证token是否过期 (这里设置为立即失效,仅允许一次使用)
+    token_data = docs_tokens.get(token)
+    if datetime.utcnow() > token_data["expires"]:
+        del docs_tokens[token]
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Token已过期，请重新认证",
+        )
+    
+    return token_data["username"]
 
 # 创建FastAPI应用实例（文档路由需要认证）
 app = FastAPI(
@@ -48,20 +82,73 @@ async def startup_event():
 from fastapi.openapi.docs import get_swagger_ui_html, get_redoc_html
 from fastapi.openapi.utils import get_openapi
 
+@app.get("/docs-auth", include_in_schema=False)
+async def docs_auth(username: str = Depends(verify_docs_credentials)):
+    """文档认证入口 - 验证成功后生成一次性token并重定向"""
+    # 生成一次性token
+    token = str(uuid.uuid4())
+    
+    # 清理过期的token
+    global docs_tokens
+    docs_tokens = {k: v for k, v in docs_tokens.items() if datetime.utcnow() <= v["expires"]}
+    
+    # 保存token (设置5秒过期,只够加载一次页面)
+    docs_tokens[token] = {
+        "username": username,
+        "expires": datetime.utcnow() + timedelta(seconds=5)
+    }
+    
+    # 重定向到实际的文档页面,带上一次性token
+    return RedirectResponse(url=f"/docs?token={token}", status_code=302)
+
 @app.get("/docs", include_in_schema=False)
-async def get_documentation(username: str = Depends(verify_docs_credentials)):
-    """需要认证的 Swagger UI 文档"""
-    return get_swagger_ui_html(openapi_url="/openapi.json", title="API文档")
+async def get_documentation(request: Request, username: str = Depends(verify_docs_token)):
+    """Swagger UI 文档 - 需要一次性token"""
+    token = request.query_params.get("token")
+    response = get_swagger_ui_html(
+        openapi_url=f"/openapi.json?token={token}", 
+        title="API文档"
+    )
+    response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
+    response.headers["Pragma"] = "no-cache"
+    return response
+
+@app.get("/redoc-auth", include_in_schema=False)
+async def redoc_auth(username: str = Depends(verify_docs_credentials)):
+    """ReDoc认证入口 - 验证成功后生成一次性token并重定向"""
+    token = str(uuid.uuid4())
+    
+    global docs_tokens
+    docs_tokens = {k: v for k, v in docs_tokens.items() if datetime.utcnow() <= v["expires"]}
+    
+    docs_tokens[token] = {
+        "username": username,
+        "expires": datetime.utcnow() + timedelta(seconds=5)
+    }
+    
+    return RedirectResponse(url=f"/redoc?token={token}", status_code=302)
 
 @app.get("/redoc", include_in_schema=False)
-async def get_redoc_documentation(username: str = Depends(verify_docs_credentials)):
-    """需要认证的 ReDoc 文档"""
-    return get_redoc_html(openapi_url="/openapi.json", title="API文档")
+async def get_redoc_documentation(request: Request, username: str = Depends(verify_docs_token)):
+    """ReDoc 文档 - 需要一次性token"""
+    token = request.query_params.get("token")
+    response = get_redoc_html(
+        openapi_url=f"/openapi.json?token={token}", 
+        title="API文档"
+    )
+    response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
+    response.headers["Pragma"] = "no-cache"
+    return response
 
 @app.get("/openapi.json", include_in_schema=False)
-async def get_open_api_endpoint(username: str = Depends(verify_docs_credentials)):
-    """需要认证的 OpenAPI schema"""
-    return get_openapi(title="挑战赛API文档", version="1.0.0", routes=app.routes)
+async def get_open_api_endpoint(username: str = Depends(verify_docs_token)):
+    """OpenAPI schema - 需要一次性token"""
+    from fastapi.responses import JSONResponse
+    openapi_schema = get_openapi(title="挑战赛API文档", version="1.0.0", routes=app.routes)
+    response = JSONResponse(content=openapi_schema)
+    response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
+    response.headers["Pragma"] = "no-cache"
+    return response
 
 # 根路径测试
 @app.get("/")
