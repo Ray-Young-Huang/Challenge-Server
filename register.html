@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Team Registration</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            width: 100%;
+            max-width: 1100px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 28px;
+        }
+
+        .form-section {
+            margin-bottom: 25px;
+        }
+
+        .section-title {
+            color: #667eea;
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="password"],
+        textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        input:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .team-members {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+
+        .member-item {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border: 1px solid #e0e0e0;
+        }
+
+        .member-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .member-header {
+            font-weight: 600;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .add-member-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-top: 10px;
+            transition: background 0.3s ease;
+        }
+
+        .add-member-btn:hover {
+            background: #5568d3;
+        }
+
+        .remove-member-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 5px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+            float: right;
+            transition: background 0.3s ease;
+        }
+
+        .remove-member-btn:hover {
+            background: #c82333;
+        }
+
+        .submit-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
+        .required {
+            color: #dc3545;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 25px;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Team Registration</h1>
+        <form id="registerForm">
+            <!-- 团队信息 -->
+            <div class="form-section">
+                <div class="section-title">Team Information</div>
+                <div class="form-group">
+                    <label for="teamName">Team Name <span class="required">*</span></label>
+                    <input type="text" id="teamName" name="teamName" required placeholder="Enter team name">
+                </div>
+            </div>
+
+            <!-- 队员信息 -->
+            <div class="form-section">
+                <div class="section-title">Team Members</div>
+                <div id="membersContainer" class="team-members">
+                    <div class="member-item" data-member="1">
+                        <div class="member-header">Member 1 (Leader)</div>
+                        <div class="form-group">
+                            <label>Name <span class="required">*</span></label>
+                            <input type="text" name="member1Name" required placeholder="Enter name">
+                        </div>
+                    </div>
+                </div>
+                <button type="button" class="add-member-btn" onclick="addMember()">+ Add Member</button>
+            </div>
+
+            <!-- 单位信息 -->
+            <div class="form-section">
+                <div class="section-title">Organization Information</div>
+                <div class="form-group">
+                    <label for="organization">Organization <span class="required">*</span></label>
+                    <input type="text" id="organization" name="organization" required placeholder="Enter school/company name">
+                </div>
+            </div>
+
+            <!-- 联系信息 -->
+            <div class="form-section">
+                <div class="section-title">Contact Information</div>
+                <div class="form-group">
+                    <label for="email">Email Address <span class="required">*</span></label>
+                    <input type="email" id="email" name="email" required placeholder="example@email.com">
+                </div>
+            </div>
+
+            <!-- 账号信息 -->
+            <div class="form-section">
+                <div class="section-title">Account Information</div>
+                <div class="form-group">
+                    <label for="username">Username <span class="required">*</span></label>
+                    <input type="text" id="username" name="username" required placeholder="Set username (6-20 characters)" minlength="6" maxlength="20">
+                </div>
+                <div class="form-group">
+                    <label for="password">Password <span class="required">*</span></label>
+                    <input type="password" id="password" name="password" required placeholder="Set password (at least 8 characters)" minlength="8">
+                </div>
+                <div class="form-group">
+                    <label for="confirmPassword">Confirm Password <span class="required">*</span></label>
+                    <input type="password" id="confirmPassword" name="confirmPassword" required placeholder="Enter password again" minlength="8">
+                </div>
+            </div>
+
+            <button type="submit" class="submit-btn">Submit Registration</button>
+        </form>
+    </div>
+
+    <script>
+        let memberCount = 1;
+
+        // 添加队员
+        function addMember() {
+            memberCount++;
+            const membersContainer = document.getElementById('membersContainer');
+            const memberItem = document.createElement('div');
+            memberItem.className = 'member-item';
+            memberItem.setAttribute('data-member', memberCount);
+            memberItem.innerHTML = `
+                <div class="member-header">
+                    Member ${memberCount}
+                    <button type="button" class="remove-member-btn" onclick="removeMember(this)">Remove</button>
+                </div>
+                <div class="form-group">
+                    <label>Name <span class="required">*</span></label>
+                    <input type="text" name="member${memberCount}Name" required placeholder="Enter name">
+                </div>
+            `;
+            membersContainer.appendChild(memberItem);
+        }
+
+        // 删除队员
+        function removeMember(btn) {
+            const memberItem = btn.closest('.member-item');
+            if (document.querySelectorAll('.member-item').length > 1) {
+                memberItem.remove();
+                updateMemberNumbers();
+            } else {
+                alert('At least one member must be kept!');
+            }
+        }
+
+        // 更新队员编号
+        function updateMemberNumbers() {
+            const members = document.querySelectorAll('.member-item');
+            members.forEach((member, index) => {
+                const header = member.querySelector('.member-header');
+                if (index === 0) {
+                    header.innerHTML = 'Member 1 (Leader)';
+                } else {
+                    header.innerHTML = `Member ${index + 1}<button type="button" class="remove-member-btn" onclick="removeMember(this)">Remove</button>`;
+                }
+            });
+        }
+
+        // 表单提交
+        document.getElementById('registerForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // 验证密码
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            
+            if (password !== confirmPassword) {
+                alert('Passwords do not match, please re-enter!');
+                return;
+            }
+
+            // 收集表单数据
+            const data = {};
+            
+            // 基本信息 - 直接从表单元素获取
+            data.teamName = document.getElementById('teamName').value;
+            data.organization = document.getElementById('organization').value;
+            data.orgAddress = '';  // 当前表单中没有这个字段
+            data.email = document.getElementById('email').value;
+            data.username = document.getElementById('username').value;
+            data.password = document.getElementById('password').value;
+            
+            // 队员信息 - 直接从每个 member-item 中读取实际的 input
+            data.members = [];
+            const memberItems = document.querySelectorAll('.member-item');
+            memberItems.forEach((item, index) => {
+                // 直接从当前 item 中查找 input 元素
+                const nameInput = item.querySelector('input[name*="Name"]');
+                if (nameInput && nameInput.value) {
+                    data.members.push({
+                        name: nameInput.value,
+                        contact: '',  // 当前表单中没有联系方式字段
+                        isLeader: index === 0
+                    });
+                }
+            });
+
+            console.log('准备提交的数据:', data);  // 调试用
+
+            // 提交到服务器
+            fetch('/api/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(err => {
+                        throw new Error(err.detail || '注册失败');
+                    });
+                }
+                return response.json();
+            })
+            .then(result => {
+                alert('注册成功！\n\n团队名称：' + result.data.teamName + '\n用户名：' + result.data.username);
+                // 完全重置表单和成员列表
+                document.getElementById('registerForm').reset();
+                const membersContainer = document.getElementById('membersContainer');
+                membersContainer.innerHTML = `
+                    <div class="member-item" data-member="1">
+                        <div class="member-header">Member 1 (Leader)</div>
+                        <div class="form-group">
+                            <label>Name <span class="required">*</span></label>
+                            <input type="text" name="member1Name" required placeholder="Enter name">
+                        </div>
+                    </div>
+                `;
+                memberCount = 1;
+            })
+            .catch(error => {
+                console.error('注册错误:', error);
+                alert('注册失败：' + error.message);
+            });
+        });
+    </script>
+</body>
+</html>
