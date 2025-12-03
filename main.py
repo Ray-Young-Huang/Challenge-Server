@@ -1,5 +1,6 @@
-from fastapi import FastAPI, HTTPException, Depends
+from fastapi import FastAPI, HTTPException, Depends, status
 from fastapi.responses import HTMLResponse
+from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from pydantic import BaseModel, EmailStr
 from typing import List, Optional
 from sqlalchemy.orm import Session
@@ -12,14 +13,55 @@ from database import init_db, get_db, TeamRegistration, TeamMember, Verification
 # 导入邮件服务
 from email_service import send_verification_email, generate_verification_code
 
-# 创建FastAPI应用实例
-app = FastAPI()
+# 导入配置
+from config import DOCS_USERNAME, DOCS_PASSWORD
+
+# HTTP Basic 认证
+security = HTTPBasic()
+
+def verify_docs_credentials(credentials: HTTPBasicCredentials = Depends(security)):
+    """验证文档访问凭证"""
+    correct_username = secrets.compare_digest(credentials.username, DOCS_USERNAME)
+    correct_password = secrets.compare_digest(credentials.password, DOCS_PASSWORD)
+    
+    if not (correct_username and correct_password):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="文档访问需要认证",
+            headers={"WWW-Authenticate": "Basic"},
+        )
+    return credentials.username
+
+# 创建FastAPI应用实例（文档路由需要认证）
+app = FastAPI(
+    docs_url=None,  # 禁用默认的 /docs
+    redoc_url=None,  # 禁用默认的 /redoc
+)
 
 # 初始化数据库
 @app.on_event("startup")
 async def startup_event():
     init_db()
     print("数据库初始化完成")
+
+# 受保护的文档路由
+from fastapi.openapi.docs import get_swagger_ui_html, get_redoc_html
+from fastapi.openapi.utils import get_openapi
+
+@app.get("/docs", include_in_schema=False)
+async def get_documentation(username: str = Depends(verify_docs_credentials)):
+    """需要认证的 Swagger UI 文档"""
+    return get_swagger_ui_html(openapi_url="/openapi.json", title="API文档")
+
+@app.get("/redoc", include_in_schema=False)
+async def get_redoc_documentation(username: str = Depends(verify_docs_credentials)):
+    """需要认证的 ReDoc 文档"""
+    return get_redoc_html(openapi_url="/openapi.json", title="API文档")
+
+@app.get("/openapi.json", include_in_schema=False)
+async def get_open_api_endpoint(username: str = Depends(verify_docs_credentials)):
+    """需要认证的 OpenAPI schema"""
+    return get_openapi(title="挑战赛API文档", version="1.0.0", routes=app.routes)
 
 # 根路径测试
 @app.get("/")
