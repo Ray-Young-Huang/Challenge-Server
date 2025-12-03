@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>个人主页 - 挑战赛</title>
+    <title>Dashboard - Challenge</title>
     <style>
         * {
             margin: 0;
@@ -297,10 +297,10 @@
 <body>
     <!-- 顶部导航栏 -->
     <div class="navbar">
-        <div class="navbar-title">🏆 挑战赛平台</div>
+        <div class="navbar-title">🏆 Challenge Platform</div>
         <div class="navbar-user">
-            <span class="user-name" id="navUsername">加载中...</span>
-            <button class="logout-btn" onclick="logout()">退出登录</button>
+            <span class="user-name" id="navUsername">Loading...</span>
+            <button class="logout-btn" onclick="logout()">Logout</button>
         </div>
     </div>
 
@@ -309,30 +309,30 @@
         <!-- 左侧：团队信息 -->
         <div class="team-info-section">
             <div class="card">
-                <h2 class="card-title">团队信息</h2>
+                <h2 class="card-title">Team Information</h2>
                 <div class="info-group">
-                    <div class="info-label">团队名称</div>
-                    <div class="info-value team-name" id="teamName">加载中...</div>
+                    <div class="info-label">Team Name</div>
+                    <div class="info-value team-name" id="teamName">Loading...</div>
                 </div>
                 <div class="info-group">
-                    <div class="info-label">所属组织</div>
-                    <div class="info-value" id="organization">加载中...</div>
+                    <div class="info-label">Organization</div>
+                    <div class="info-value" id="organization">Loading...</div>
                 </div>
                 <div class="info-group">
-                    <div class="info-label">联系邮箱</div>
-                    <div class="info-value" id="email">加载中...</div>
+                    <div class="info-label">Contact Email</div>
+                    <div class="info-value" id="email">Loading...</div>
                 </div>
                 <div class="info-group">
-                    <div class="info-label">用户名</div>
-                    <div class="info-value" id="username">加载中...</div>
+                    <div class="info-label">Username</div>
+                    <div class="info-value" id="username">Loading...</div>
                 </div>
             </div>
 
             <div class="card">
-                <h2 class="card-title">团队成员</h2>
+                <h2 class="card-title">Team Members</h2>
                 <ul class="member-list" id="memberList">
                     <li class="member-item">
-                        <span class="member-name">加载中...</span>
+                        <span class="member-name">Loading...</span>
                     </li>
                 </ul>
             </div>
@@ -341,30 +341,30 @@
         <!-- 右侧：提交链接 -->
         <div class="submission-section">
             <div class="card">
-                <h2 class="card-title">提交作品链接</h2>
+                <h2 class="card-title">Submit Project Link</h2>
                 <form class="submit-form" id="submitForm">
                     <div class="form-group">
-                        <label class="form-label" for="linkTitle">作品标题 *</label>
-                        <input type="text" class="form-input" id="linkTitle" required placeholder="请输入作品标题">
+                        <label class="form-label" for="linkTitle">Project Title *</label>
+                        <input type="text" class="form-input" id="linkTitle" required placeholder="Enter project title">
                     </div>
                     <div class="form-group">
-                        <label class="form-label" for="linkUrl">作品链接 *</label>
+                        <label class="form-label" for="linkUrl">Project Link *</label>
                         <input type="url" class="form-input" id="linkUrl" required placeholder="https://example.com/your-project">
                     </div>
                     <div class="form-group">
-                        <label class="form-label" for="linkDescription">作品描述</label>
-                        <textarea class="form-input" id="linkDescription" placeholder="简要描述您的作品（可选）"></textarea>
+                        <label class="form-label" for="linkDescription">Project Description</label>
+                        <textarea class="form-input" id="linkDescription" placeholder="Brief description of your project (optional)"></textarea>
                     </div>
-                    <button type="submit" class="submit-btn" id="submitBtn">提交作品</button>
+                    <button type="submit" class="submit-btn" id="submitBtn">Submit Project</button>
                 </form>
             </div>
 
             <div class="card submission-history">
-                <h2 class="card-title">提交历史</h2>
+                <h2 class="card-title">Submission History</h2>
                 <div id="historyList">
                     <div class="empty-state">
                         <div class="empty-icon">📝</div>
-                        <p>暂无提交记录</p>
+                        <p>No submissions yet</p>
                     </div>
                 </div>
             </div>
@@ -382,7 +382,7 @@
             const userDataStr = localStorage.getItem('userData');
 
             if (!token || !userDataStr) {
-                alert('请先登录');
+                alert('Please login first');
                 window.location.href = '/login';
                 return;
             }
@@ -416,7 +416,7 @@
                 const result = await response.json();
 
                 if (!response.ok) {
-                    throw new Error(result.detail || '加载成员失败');
+                    throw new Error(result.detail || 'Failed to load members');
                 }
 
                 const memberList = document.getElementById('memberList');
@@ -424,14 +424,15 @@
                     memberList.innerHTML = result.data.map(member => `
                         <li class="member-item">
                             <span class="member-name">${member.name}</span>
-                            ${member.isLeader ? '<span class="leader-badge">队长</span>' : ''}
+                            ${member.isLeader ? '<span class="leader-badge">Leader</span>' : ''}
                         </li>
                     `).join('');
                 } else {
-                    memberList.innerHTML = '<li class="member-item"><span class="member-name">暂无成员</span></li>';
+                    memberList.innerHTML = '<li class="member-item"><span class="member-name">No members</span></li>';
                 }
             } catch (error) {
-                console.error('加载成员失败:', error);
+                console.error('Failed to load members:', error);
+                document.getElementById('memberList').innerHTML = '<li class="member-item"><span class="member-name">Failed to load members</span></li>';
             }
         }
 
@@ -444,13 +445,13 @@
             const description = document.getElementById('linkDescription').value.trim();
 
             if (!title || !url) {
-                alert('请填写作品标题和链接');
+                alert('Please fill in project title and link');
                 return;
             }
 
             const submitBtn = document.getElementById('submitBtn');
             submitBtn.disabled = true;
-            submitBtn.textContent = '提交中...';
+            submitBtn.textContent = 'Submitting...';
 
             try {
                 const response = await fetch('/api/submission', {
@@ -470,25 +471,25 @@
                 const result = await response.json();
 
                 if (!response.ok) {
-                    throw new Error(result.detail || '提交失败');
+                    throw new Error(result.detail || 'Submission failed');
                 }
 
-                alert('✅ 作品提交成功！');
+                alert('✅ Project submitted successfully!');
                 
-                // 清空表单
+                // Clear form
                 document.getElementById('linkTitle').value = '';
                 document.getElementById('linkUrl').value = '';
                 document.getElementById('linkDescription').value = '';
 
-                // 重新加载提交历史
+                // Reload submission history
                 await loadSubmissionHistory();
 
             } catch (error) {
-                console.error('提交失败:', error);
-                alert('提交失败：' + error.message);
+                console.error('Submission failed:', error);
+                alert('Submission failed: ' + error.message);
             } finally {
                 submitBtn.disabled = false;
-                submitBtn.textContent = '提交作品';
+                submitBtn.textContent = 'Submit Project';
             }
         });
 
@@ -515,16 +516,16 @@
                     historyList.innerHTML = `
                         <div class="empty-state">
                             <div class="empty-icon">📝</div>
-                            <p>暂无提交记录</p>
+                            <p>No submissions yet</p>
                         </div>
                     `;
                 }
             } catch (error) {
-                console.error('加载提交历史失败:', error);
+                console.error('Failed to load submission history:', error);
             }
         }
 
-        // 格式化时间
+        // Format time
         function formatTime(dateString) {
             const date = new Date(dateString);
             const now = new Date();
@@ -533,17 +534,17 @@
             const hours = Math.floor(diff / 3600000);
             const days = Math.floor(diff / 86400000);
 
-            if (minutes < 1) return '刚刚';
-            if (minutes < 60) return `${minutes}分钟前`;
-            if (hours < 24) return `${hours}小时前`;
-            if (days < 7) return `${days}天前`;
+            if (minutes < 1) return 'Just now';
+            if (minutes < 60) return `${minutes} minutes ago`;
+            if (hours < 24) return `${hours} hours ago`;
+            if (days < 7) return `${days} days ago`;
             
-            return date.toLocaleDateString('zh-CN');
+            return date.toLocaleDateString('en-US');
         }
 
-        // 退出登录
+        // Logout
         function logout() {
-            if (confirm('确定要退出登录吗？')) {
+            if (confirm('Are you sure you want to logout?')) {
                 localStorage.removeItem('token');
                 localStorage.removeItem('userData');
                 window.location.href = '/login';

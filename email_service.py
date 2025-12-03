@@ -33,13 +33,14 @@ def generate_verification_code(length=6) -> str:
     return ''.join(random.choices(string.digits, k=length))
 
 
-def send_verification_email(recipient_email: str, verification_code: str) -> bool:
+def send_verification_email(recipient_email: str, verification_code: str, server_url: str = None) -> bool:
     """
     发送验证码邮件
     
     Args:
         recipient_email: 收件人邮箱
         verification_code: 验证码
+        server_url: 服务器地址(可选),如果提供则在邮件中包含验证链接
         
     Returns:
         bool: 发送是否成功
@@ -52,13 +53,13 @@ def send_verification_email(recipient_email: str, verification_code: str) -> boo
     
     try:
         # 构建邮件内容
-        html_content = build_verification_email_template(verification_code)
+        html_content = build_verification_email_template(verification_code, recipient_email, server_url)
         
         # 创建邮件对象
         message = MIMEMultipart('alternative')
         message['From'] = EMAIL_SENDER
         message['To'] = recipient_email
-        message['Subject'] = Header("注册验证码 - 请验证您的邮箱", 'utf-8')
+        message['Subject'] = Header("Registration Verification Code - Please Verify Your Email", 'utf-8')
         
         # 添加HTML内容
         html_part = MIMEText(html_content, 'html', 'utf-8')
@@ -92,10 +93,46 @@ def send_verification_email(recipient_email: str, verification_code: str) -> boo
         return False
 
 
-def build_verification_email_template(verification_code: str) -> str:
+def build_verification_email_template(verification_code: str, recipient_email: str, server_url: str = None) -> str:
     """
     构建验证码邮件模板
+    
+    Args:
+        verification_code: 验证码
+        recipient_email: 收件人邮箱
+        server_url: 服务器地址(可选)
     """
+    
+    # 构建验证链接
+    from urllib.parse import quote
+    verification_link = ""
+    if server_url:
+        verification_link = f"{server_url}/verify?email={quote(recipient_email)}"
+    
+    # 如果有链接,添加按钮区域
+    link_section = ""
+    if verification_link:
+        link_section = f"""
+        <div class="info">
+            <p style="text-align: center; margin: 20px 0;">
+                <a href="{verification_link}" 
+                   style="display: inline-block; 
+                          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                          color: white;
+                          padding: 12px 30px;
+                          border-radius: 8px;
+                          text-decoration: none;
+                          font-weight: 600;
+                          font-size: 16px;">
+                    🔗 Open Verification Page
+                </a>
+            </p>
+            <p style="text-align: center; color: #7f8c8d; font-size: 12px;">
+                Or copy this link: <br>
+                <a href="{verification_link}" style="color: #3498db; word-break: break-all;">{verification_link}</a>
+            </p>
+        </div>
+        """
     
     html = f"""
 <!DOCTYPE html>
@@ -189,29 +226,31 @@ def build_verification_email_template(verification_code: str) -> str:
     <div class="container">
         <div class="header">
             <div class="icon">✉️</div>
-            <h1>邮箱验证</h1>
+            <h1>Email Verification</h1>
         </div>
         
         <div class="info">
-            <p>感谢您注册 <strong>{SYSTEM_NAME}</strong>！</p>
-            <p>请使用以下验证码完成注册：</p>
+            <p>Thank you for registering <strong>{SYSTEM_NAME}</strong>!</p>
+            <p>Please use the following verification code to complete your registration:</p>
         </div>
         
         <div class="code-section">
             <div class="code">{verification_code}</div>
-            <div class="code-label">验证码</div>
+            <div class="code-label">Verification Code</div>
         </div>
         
+        {link_section}
+        
         <div class="warning">
-            <p>⏰ <strong>验证码有效期：10分钟</strong></p>
-            <p>🔒 请勿将验证码告知他人</p>
-            <p>❓ 如果这不是您的操作，请忽略此邮件</p>
+            <p>⏰ <strong>Code expires in: 10 minutes</strong></p>
+            <p>🔒 Do not share this code with anyone</p>
+            <p>❓ If this was not you, please ignore this email</p>
         </div>
         
         <div class="footer">
-            <p>如有疑问，请联系：<a href="mailto:{CONTACT_EMAIL}">{CONTACT_EMAIL}</a></p>
+            <p>If you have any questions, please contact: <a href="mailto:{CONTACT_EMAIL}">{CONTACT_EMAIL}</a></p>
             <p style="margin-top: 15px; font-size: 12px; color: #95a5a6;">
-                此邮件由 {SYSTEM_NAME} 自动发送，请勿直接回复
+                This email was automatically sent by {SYSTEM_NAME}, please do not reply
             </p>
         </div>
     </div>
@@ -310,7 +349,7 @@ def build_email_template(
     # 构建成员列表HTML
     members_html = ""
     for member in members:
-        leader_badge = "👑 队长" if member.get("isLeader", False) else "成员"
+        leader_badge = "👑 Leader" if member.get("isLeader", False) else "Member"
         members_html += f"<li>{member['name']} ({leader_badge})</li>\n"
     
     # HTML模板
@@ -399,7 +438,7 @@ def build_email_template(
     <div class="container">
         <div class="header">
             <div class="success-icon">✅</div>
-            <h1>Congratulations for successfully registering for theCSV Challenge (ISBI2026)!</h1>
+            <h1>Congratulations for successfully registering for the CSV Challenge (ISBI2026)!</h1>
         </div>
         
         <div class="info-section">
@@ -419,7 +458,7 @@ def build_email_template(
             </div>
             
             <div class="info-row">
-                <div class="label">Team Members ({len(members)}人)</div>
+                <div class="label">Team Members ({len(members)} members)</div>
                 <ul class="members-list">
                     {members_html}
                 </ul>

@@ -304,7 +304,7 @@
             const confirmPassword = document.getElementById('confirmPassword').value;
             
             if (password !== confirmPassword) {
-                alert('Passwords do not match, please re-enter!');
+                alert('Passwords do not match, please try again!');
                 return;
             }
 
@@ -334,9 +334,9 @@
                 }
             });
 
-            console.log('准备提交的数据:', data);  // 调试用
+            console.log('Data to be submitted:', data);  // For debugging
 
-            // 提交到服务器
+            // Submit to server
             fetch('/api/register', {
                 method: 'POST',
                 headers: {
@@ -347,19 +347,19 @@
             .then(response => {
                 if (!response.ok) {
                     return response.json().then(err => {
-                        throw new Error(err.detail || '注册失败');
+                        throw new Error(err.detail || 'Registration failed');
                     });
                 }
                 return response.json();
             })
             .then(result => {
-                alert('验证码已发送到您的邮箱！\n请查收邮件并输入验证码完成注册。');
-                // 跳转到验证码页面，并传递邮箱信息
+                alert('Verification code has been sent to your email!\nPlease check your email and enter the code to complete registration.');
+                // Redirect to verification page with email
                 window.location.href = '/verify?email=' + encodeURIComponent(data.email);
             })
             .catch(error => {
-                console.error('注册错误:', error);
-                alert('注册失败：' + error.message);
+                console.error('Registration error:', error);
+                alert('Registration failed: ' + error.message);
             });
         });
     </script>

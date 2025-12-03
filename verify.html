@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>邮箱验证</title>
+    <title>Email Verification</title>
     <style>
         * {
             margin: 0;
@@ -154,8 +154,8 @@
 <body>
     <div class="container">
         <div class="icon">✉️</div>
-        <h1>验证您的邮箱</h1>
-        <p class="subtitle">我们已向您的邮箱发送了一封包含验证码的邮件</p>
+        <h1>Verify Your Email Address</h1>
+        <p class="subtitle">We have sent an email to your mailbox containing a verification code</p>
         
         <div class="email-display" id="emailDisplay"></div>
         
@@ -169,15 +169,15 @@
                 <input type="text" class="code-input" maxlength="1" id="code6" autocomplete="off">
             </div>
             
-            <div class="timer" id="timer">验证码有效期：10:00</div>
+            <div class="timer" id="timer">Code expires in: 10:00</div>
             
-            <button type="submit" class="submit-btn" id="submitBtn">验证并完成注册</button>
+            <button type="submit" class="submit-btn" id="submitBtn">Verify and Complete Registration</button>
         </form>
         
         <div class="tips">
-            <p>💡 <strong>提示：</strong></p>
-            <p>• 请检查您的邮箱收件箱或垃圾邮件文件夹</p>
-            <p>• 验证码有效期为10分钟</p>
+            <p>💡 <strong>Tips:</strong></p>
+            <p>• Please check your inbox or spam folder</p>
+            <p>• Verification code is valid for 10 minutes</p>
         </div>
     </div>
 
@@ -187,7 +187,7 @@
         const email = urlParams.get('email');
         
         if (!email) {
-            alert('缺少邮箱信息，请重新注册');
+            alert('Email information is missing, please register again');
             window.location.href = '/register';
         }
         
@@ -250,27 +250,80 @@
         // 自动聚焦第一个输入框
         codeInputs[0].focus();
         
-        // 倒计时功能
-        let timeLeft = 600; // 10分钟
+        // 从服务器获取验证码剩余时间并启动倒计时
+        let timeLeft = 600; // 默认10分钟
+        let timerInterval = null;
         const timerElement = document.getElementById('timer');
         
-        const timerInterval = setInterval(() => {
-            timeLeft--;
+        // 获取服务器端的剩余时间
+        async function initializeTimer() {
+            try {
+                const response = await fetch(`/api/verify/time-left?email=${encodeURIComponent(email)}`);
+                const result = await response.json();
+                
+                if (response.ok && result.status === 'success') {
+                    timeLeft = result.data.timeLeft;
+                    
+                    // 如果已过期
+                    if (result.data.isExpired || timeLeft <= 0) {
+                        timerElement.textContent = 'Verification code expired';
+                        timerElement.classList.add('warning');
+                        document.getElementById('submitBtn').disabled = true;
+                        alert('Verification code expired, please register again');
+                        return;
+                    }
+                    
+                    // 启动倒计时
+                    startTimer();
+                } else {
+                    console.error('Failed to get verification time:', result);
+                    // 如果获取失败,使用默认的10分钟倒计时
+                    startTimer();
+                }
+            } catch (error) {
+                console.error('Error fetching verification time:', error);
+                // 如果请求失败,使用默认的10分钟倒计时
+                startTimer();
+            }
+        }
+        
+        // 启动倒计时
+        function startTimer() {
+            // 更新显示
+            updateTimerDisplay();
+            
+            // 清除可能存在的旧定时器
+            if (timerInterval) {
+                clearInterval(timerInterval);
+            }
+            
+            // 开始新的倒计时
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                updateTimerDisplay();
+                
+                if (timeLeft <= 60) {
+                    timerElement.classList.add('warning');
+                }
+                
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    timerElement.textContent = 'Verification code expired';
+                    document.getElementById('submitBtn').disabled = true;
+                    alert('Verification code expired, please register again');
+                }
+            }, 1000);
+        }
+        
+        // 更新倒计时显示
+        function updateTimerDisplay() {
             const minutes = Math.floor(timeLeft / 60);
             const seconds = timeLeft % 60;
-            timerElement.textContent = `验证码有效期：${minutes}:${seconds.toString().padStart(2, '0')}`;
-            
-            if (timeLeft <= 60) {
-                timerElement.classList.add('warning');
-            }
-            
-            if (timeLeft <= 0) {
-                clearInterval(timerInterval);
-                timerElement.textContent = '验证码已过期';
-                document.getElementById('submitBtn').disabled = true;
-                alert('验证码已过期，请重新注册');
-            }
-        }, 1000);
+            timerElement.textContent = `Code expires in: ${minutes}:${seconds.toString().padStart(2, '0')}`;
+        }
+        
+        // 初始化倒计时
+        initializeTimer();
         
         // 表单提交
         document.getElementById('verifyForm').addEventListener('submit', async (e) => {
@@ -280,7 +333,7 @@
             const code = Array.from(codeInputs).map(input => input.value).join('');
             
             if (code.length !== 6) {
-                alert('请输入完整的6位验证码');
+                alert('Please enter the complete 6-digit verification code');
                 return;
             }
             
@@ -300,20 +353,22 @@
                 const result = await response.json();
                 
                 if (!response.ok) {
-                    throw new Error(result.detail || '验证失败');
+                    throw new Error(result.detail || 'Verification failed');
                 }
                 
                 // 验证成功
-                clearInterval(timerInterval);
+                if (timerInterval) {
+                    clearInterval(timerInterval);
+                }
                 
-                alert('🎉 注册成功！\n\n团队名称：' + result.data.teamName + '\n用户名：' + result.data.username);
+                alert('🎉 Registration successful!\n\nTeam Name: ' + result.data.teamName + '\nUsername: ' + result.data.username);
                 
                 // 跳转到登录页
                 window.location.href = '/login';
                 
             } catch (error) {
-                console.error('验证错误:', error);
-                alert('验证失败：' + error.message);
+                console.error('Verification error:', error);
+                alert('Verification failed: ' + error.message);
                 
                 // 清空输入框
                 codeInputs.forEach(input => {

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>CSV 2026 Challenge - Participate and Submission</title>
+  <title>CSV 2026 Challenge - Timeline</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <!-- 和首页共用同一个 CSS -->
   <link rel="stylesheet" href="main.css">
@@ -20,12 +20,13 @@
         <a href="index.html" class="nav-item">Home</a>
         <a href="registration.html" class="nav-item">Registration</a>
         <a href="participate.html" class="nav-item">Participate &amp; Submission</a>
-        <a href="timeline.html" class="nav-item">Timeline</a>
+        <a href="timeline.html" class="nav-item  active">Timeline</a>
         <a href="assessment.html" class="nav-item">Ranking and Scoring</a>
-        <a href="rules.html" class="nav-item active">Challenge Rules &amp; Policies</a>
+        <a href="rules.html" class="nav-item">Challenge Rules &amp; Policies</a>
         <a href="leaderboard.html" class="nav-item">Leaderboard</a>
         <a href="organizers.html" class="nav-item">Organizers</a>
         <a href="contact.html" class="nav-item">Contact Us</a>
+
       </nav>
     </aside>
 
@@ -40,51 +41,109 @@
       <div class="search-box">
         <input type="search" id="site-search-input" class="search-input" placeholder="Search CSV 2026" autocomplete="off">
         <span class="search-icon">🔍</span>
+
+        <!-- 搜索结果：放在 search-box 里面 -->
         <div id="site-search-results" class="site-search-results"></div>
       </div>
       </header>
-      <main class="main-content">
-        <h1 class="page-title">Challenge Rules</h1>
 
-        <h2 class="subtitle">Methods</h2>
-        <p>
-          Participants can build their own methods based on existing open-source general models, and the 
-          competition is participated in online. The testing of this project will be conducted using our 
-          private dataset. In addition, participants are required to submit a document to the International 
-          Symposium on Biomedical Imaging (ISBI) challenge, introducing the details of their research methods 
-          and elaborating on innovative points in preprocessing, model architecture, or post-processing.
-        </p>
+        <main class="main-content">
+        <div class="hreo-center">
+            <img src="timeline.png" alt="Time line" class="hero-image">
+        </div>
+          <!-- <img src="assets/timeline.png" alt="Timeline">  -->
+        <h4 class="schedule-heading">
+          The following schedule is formulated in accordance with Greenwich Mean Time (UTC+0)
+        </h4>
 
-        <h2 class="subtitle">Use of Training Data and Models</h2>
-        <p>
-          Publicly available pre trained models can be used, but to ensure fairness and reproducibility of the 
-          results, the use of unpublished pre trained models is prohibited. Participants are not allowed to use 
-          any dataset other than the dataset provided by us
-        </p>
+        <div class="schedule">
+          <div class="schedule-item">
+            <div class="schedule-date">
+              Dec 7, 2025 - Dec 14, 2025
+            </div>
+            <div class="schedule-body">
+              <div class="schedule-title">Registration</div>
+              <div class="schedule-desc">
+                Challenge registration opens.
+              </div>
+            </div>
+          </div>
 
-        <h2 class="subtitle">Prohibit Participants from Using Ensemble Learning</h2>
-        <p>
-          Ensemble learning improves performance by combining multiple base learners, but it tends to mask the model 
-          design flaws and hyperparameter tuning shortcomings of individual models. To more accurately assess participants' 
-          true capabilities in core aspects such as feature engineering, model structure design, and hyperparameter tuning, 
-          and to guide everyone to focus on the performance and innovative ideas of the models themselves, this rule is hereby 
-          established. Participants who have used ensemble learning will not appear on the leaderboard.
-        </p>
+          <div class="schedule-item">
+            <div class="schedule-date">
+              Dec 15, 2025 - Feb 1, 2026
+            </div>
+            <div class="schedule-body">
+              <div class="schedule-title">Algorithm Development</div>
+              <div class="schedule-desc">
+                Dataset and initial code release.
+              </div>
+            </div>
+          </div>
 
-        <h2 class="subtitle">Obligations of Participants</h2>
-        <p>
-          Participants must fulfill the following obligations; otherwise, they will not be eligible for ranking, participation 
-          in the challenge winner selection, or any other awards:
-        </p>
-        <ul>
-        <li>Present their research methods at the final event of the challenge held during the 2026 International Symposium on Biomedical Imaging (ISBI).</li>
-        <li>Submit a paper that reports the details of the research methods, with a length limit of no more than 5 pages.</li>
-        <li>Sign and return all prize confirmation documents required by the competition sponsors/organizers.</li>
-        <li>Commit to citing the papers related to this data challenge and the data overview paper whenever submitting the developed methods to scientific or non-scientific publications.</li>
-        <li>Ensure that the dataset provided in this challenge is not used for commercial purposes.</li>
-      </ul>
-      </main>
+          <div class="schedule-item">
+            <div class="schedule-date">
+              Feb 2, 2026 - Feb 15, 2026
+            </div>
+            <div class="schedule-body">
+              <div class="schedule-title">Validation</div>
+              <div class="schedule-desc">
+                The validating phase begins.
+              </div>
+            </div>
+          </div>
+
+          <div class="schedule-item">
+            <div class="schedule-date">
+              Feb 16, 2026 - Feb 22, 2026
+            </div>
+            <div class="schedule-body">
+              <div class="schedule-title">Test</div>
+              <div class="schedule-desc">
+                The test phase begins.
+              </div>
+            </div>
+          </div>
+
+          <div class="schedule-item">
+            <div class="schedule-date">
+              Feb 23, 2026 - Mar 1, 2026
+            </div>
+            <div class="schedule-body">
+              <div class="schedule-title">Publish the final results</div>
+              <div class="schedule-desc">
+                The challenge organizer ranks the submitted algorithms according to the prescribed evaluation method.
+              </div>
+            </div>
+          </div>
+
+          <div class="schedule-item">
+            <div class="schedule-date">
+              Mar 2, 2026 - Mar 15, 2026
+            </div>
+            <div class="schedule-body">
+              <div class="schedule-title">Submit the final report</div>
+              <div class="schedule-desc">
+                The participating teams who have completed the submission will be required to submit a report on the algorithm implementation.
+              </div>
+            </div>
+          </div>
+
+          <div class="schedule-item">
+            <div class="schedule-date">
+              Apr 8, 2026 - Apr 11, 2026
+            </div>
+            <div class="schedule-body">
+              <div class="schedule-title">Announcing the winners</div>
+              <div class="schedule-desc">
+                ISBI conference begins, announcing the list of winners.
+              </div>
+            </div>
+          </div>
+        </div>
+        </main>
     </div>
+  </div>
   </div>
     <script>
     // 1) 列出站点所有需要搜索的页面（只填标题和链接即可）
@@ -99,6 +158,7 @@
       { title: 'Contact Us',             url: 'contact.html' }
     ];
 
+    // 2) 抓取页面正文文本，存到 SITE_PAGES 里
     async function buildSearchIndex() {
       const parser = new DOMParser();
 

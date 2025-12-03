@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>登录</title>
+    <title>Login</title>
     <style>
         * {
             margin: 0;
@@ -191,38 +191,38 @@
     <div class="container">
         <div class="header">
             <div class="icon">🔐</div>
-            <h1>欢迎回来</h1>
-            <p class="subtitle">请登录您的账户</p>
+            <h1>Welcome Back</h1>
+            <p class="subtitle">Please login to your account</p>
         </div>
 
         <div class="error-message" id="errorMessage"></div>
 
         <form id="loginForm">
             <div class="form-group">
-                <label for="username">用户名或邮箱</label>
+                <label for="username">Username or Email</label>
                 <input type="text" id="username" name="username" required autocomplete="username">
             </div>
 
             <div class="form-group">
-                <label for="password">密码</label>
+                <label for="password">Password</label>
                 <input type="password" id="password" name="password" required autocomplete="current-password">
             </div>
 
             <label class="remember-me">
                 <input type="checkbox" id="rememberMe">
-                记住我
+                Remember Me
             </label>
 
-            <button type="submit" class="login-btn" id="loginBtn">登录</button>
+            <button type="submit" class="login-btn" id="loginBtn">Login</button>
         </form>
 
         <div class="divider">
-            <span>或</span>
+            <span>OR</span>
         </div>
 
         <div class="register-section">
             <button type="button" class="register-btn" onclick="window.location.href='/register'">
-                创建新账户
+                Create New Account
             </button>
         </div>
     </div>
@@ -274,10 +274,10 @@
                 const result = await response.json();
 
                 if (!response.ok) {
-                    throw new Error(result.detail || '登录失败');
+                    throw new Error(result.detail || 'Login failed');
                 }
 
-                // 登录成功，保存token和用户数据
+                // Login successful, save token and user data
                 if (result.token) {
                     localStorage.setItem('token', result.token);
                 }
@@ -291,11 +291,11 @@
                 showError(error.message);
             } finally {
                 loginBtn.disabled = false;
-                loginBtn.textContent = '登录';
+                loginBtn.textContent = 'Login';
             }
         });
 
-        // 回车键快捷登录
+        // Enter key shortcut for login
         document.addEventListener('keypress', (e) => {
             if (e.key === 'Enter' && !loginBtn.disabled) {
                 loginForm.dispatchEvent(new Event('submit'));

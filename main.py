@@ -15,7 +15,7 @@ from database import init_db, get_db, TeamRegistration, TeamMember, Verification
 from email_service import send_verification_email, generate_verification_code
 
 # 导入配置
-from config import DOCS_USERNAME, DOCS_PASSWORD
+from config import DOCS_USERNAME, DOCS_PASSWORD, SERVER_URL
 
 # 存储一次性访问token (实际生产环境应使用Redis等缓存)
 # 格式: {token: {"username": str, "expires": datetime}}
@@ -29,7 +29,7 @@ def verify_docs_credentials(credentials: HTTPBasicCredentials = Depends(security
     if not credentials:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="文档访问需要认证",
+            detail="Authentication required for documentation access",
             headers={"WWW-Authenticate": 'Basic realm="API Documentation"'},
         )
     
@@ -39,7 +39,7 @@ def verify_docs_credentials(credentials: HTTPBasicCredentials = Depends(security
     if not (correct_username and correct_password):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="用户名或密码错误",
+            detail="Incorrect username or password",
             headers={"WWW-Authenticate": 'Basic realm="API Documentation"'},
         )
     
@@ -107,7 +107,7 @@ async def get_documentation(request: Request, username: str = Depends(verify_doc
     token = request.query_params.get("token")
     response = get_swagger_ui_html(
         openapi_url=f"/openapi.json?token={token}", 
-        title="API文档"
+        title="API Documentation"
     )
     response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
     response.headers["Pragma"] = "no-cache"
@@ -134,7 +134,7 @@ async def get_redoc_documentation(request: Request, username: str = Depends(veri
     token = request.query_params.get("token")
     response = get_redoc_html(
         openapi_url=f"/openapi.json?token={token}", 
-        title="API文档"
+        title="API Documentation"
     )
     response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
     response.headers["Pragma"] = "no-cache"
@@ -153,7 +153,7 @@ async def get_open_api_endpoint(username: str = Depends(verify_docs_token)):
 # 根路径测试
 @app.get("/")
 async def root():
-    return {"message": "服务器运行正常", "status": "ok"}
+    return {"message": "Server is running normally", "status": "ok"}
 
 # 定义API数据模型（Pydantic）
 class Member(BaseModel):
@@ -235,14 +235,14 @@ async def register_team(data: RegistrationData, db: Session = Depends(get_db)):
         TeamRegistration.username == data.username
     ).first()
     if existing_username:
-        raise HTTPException(status_code=400, detail="用户名已存在")
+        raise HTTPException(status_code=400, detail="Username already exists")
     
     # 检查邮箱是否已存在
     existing_email = db.query(TeamRegistration).filter(
         TeamRegistration.email == data.email
     ).first()
     if existing_email:
-        raise HTTPException(status_code=400, detail="邮箱已被注册")
+        raise HTTPException(status_code=400, detail="Email already registered")
     
     # 生成验证码
     verification_code = generate_verification_code(6)
@@ -289,24 +289,54 @@ async def register_team(data: RegistrationData, db: Session = Depends(get_db)):
     
     # 发送验证码邮件
     try:
-        email_sent = send_verification_email(data.email, verification_code)
+        email_sent = send_verification_email(data.email, verification_code, SERVER_URL)
         
         if email_sent:
             print(f"✅ 验证码已发送至: {data.email}")
         else:
             print(f"⚠️ 验证码发送失败: {data.email}")
-            raise HTTPException(status_code=500, detail="验证码发送失败，请稍后重试")
+            raise HTTPException(status_code=500, detail="Failed to send verification code, please try again later")
             
     except Exception as e:
         print(f"❌ 邮件发送异常: {str(e)}")
-        raise HTTPException(status_code=500, detail="验证码发送失败，请稍后重试")
+        raise HTTPException(status_code=500, detail="Failed to send verification code, please try again later")
     
     return {
         "status": "success",
-        "message": "验证码已发送到您的邮箱，请查收",
+        "message": "Verification code has been sent to your email",
         "data": {
             "email": data.email,
             "expiresIn": 600  # 10分钟 = 600秒
+        }
+    }
+
+# 获取验证码剩余时间
+@app.get("/api/verify/time-left")
+async def get_verification_time_left(email: str, db: Session = Depends(get_db)):
+    # 查找该邮箱最新的未使用验证码
+    db_code = db.query(VerificationCode).filter(
+        VerificationCode.email == email,
+        VerificationCode.is_used == False
+    ).order_by(VerificationCode.created_at.desc()).first()
+    
+    if not db_code:
+        raise HTTPException(status_code=404, detail="No verification code found for this email")
+    
+    # 计算剩余时间(秒)
+    current_time = datetime.utcnow()
+    time_left = (db_code.expires_at - current_time).total_seconds()
+    
+    # 如果已过期,返回0
+    if time_left < 0:
+        time_left = 0
+    
+    return {
+        "status": "success",
+        "data": {
+            "timeLeft": int(time_left),
+            "createdAt": db_code.created_at.isoformat(),
+            "expiresAt": db_code.expires_at.isoformat(),
+            "isExpired": time_left <= 0
         }
     }
 
@@ -321,11 +351,11 @@ async def verify_code(data: VerifyCodeData, db: Session = Depends(get_db)):
     ).first()
     
     if not db_code:
-        raise HTTPException(status_code=400, detail="验证码错误或已失效")
+        raise HTTPException(status_code=400, detail="Invalid or expired verification code")
     
     # 检查是否过期
     if datetime.utcnow() > db_code.expires_at:
-        raise HTTPException(status_code=400, detail="验证码已过期，请重新注册")
+        raise HTTPException(status_code=400, detail="Verification code expired, please register again")
     
     # 查找对应的注册信息
     db_team = db.query(TeamRegistration).filter(
@@ -334,7 +364,7 @@ async def verify_code(data: VerifyCodeData, db: Session = Depends(get_db)):
     ).first()
     
     if not db_team:
-        raise HTTPException(status_code=404, detail="未找到待验证的注册信息")
+        raise HTTPException(status_code=404, detail="Pending registration not found")
     
     # 标记验证码为已使用
     db_code.is_used = True
@@ -347,7 +377,7 @@ async def verify_code(data: VerifyCodeData, db: Session = Depends(get_db)):
     
     return {
         "status": "success",
-        "message": "注册成功！",
+        "message": "Registration successful!",
         "data": {
             "teamName": db_team.teamName,
             "username": db_team.username,
@@ -365,15 +395,15 @@ async def login_user(data: LoginData, db: Session = Depends(get_db)):
     ).first()
     
     if not user:
-        raise HTTPException(status_code=401, detail="用户名或密码错误")
+        raise HTTPException(status_code=401, detail="Incorrect username or password")
     
     # 检查用户是否已验证邮箱
     if not user.is_verified:
-        raise HTTPException(status_code=403, detail="账户尚未验证，请先完成邮箱验证")
+        raise HTTPException(status_code=403, detail="Account not verified, please complete email verification first")
     
     # 验证密码（实际应用中应该使用哈希比对）
     if user.password != data.password:
-        raise HTTPException(status_code=401, detail="用户名或密码错误")
+        raise HTTPException(status_code=401, detail="Incorrect username or password")
     
     # 生成简单的token（实际应用中应该使用JWT）
     token = secrets.token_urlsafe(32)
@@ -448,7 +478,7 @@ async def get_team_members(username: str, db: Session = Depends(get_db)):
     ).first()
     
     if not team:
-        raise HTTPException(status_code=404, detail="团队不存在")
+        raise HTTPException(status_code=404, detail="Team not found")
     
     return {
         "status": "success",
@@ -487,7 +517,7 @@ async def submit_work(data: SubmissionData, db: Session = Depends(get_db)):
     
     return {
         "status": "success",
-        "message": "作品提交成功",
+        "message": "Submission successful",
         "data": {
             "id": submission.id,
             "title": submission.title,
@@ -506,7 +536,7 @@ async def get_submissions(username: str, db: Session = Depends(get_db)):
     ).first()
     
     if not user:
-        raise HTTPException(status_code=404, detail="用户不存在")
+        raise HTTPException(status_code=404, detail="User not found")
     
     # 获取该用户的所有提交记录，按时间倒序
     submissions = db.query(Submission).filter(

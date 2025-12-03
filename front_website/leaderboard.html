@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>CSV 2026 Challenge - Leaderboard</title>
+  <title>CSV 2026 Challenge - Participate and Submission</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <!-- 和首页共用同一个 CSS -->
   <link rel="stylesheet" href="main.css">
@@ -20,6 +20,7 @@
         <a href="index.html" class="nav-item">Home</a>
         <a href="registration.html" class="nav-item">Registration</a>
         <a href="participate.html" class="nav-item">Participate &amp; Submission</a>
+        <a href="timeline.html" class="nav-item">Timeline</a>
         <a href="assessment.html" class="nav-item">Ranking and Scoring</a>
         <a href="rules.html" class="nav-item">Challenge Rules &amp; Policies</a>
         <a href="leaderboard.html" class="nav-item active">Leaderboard</a>
@@ -34,12 +35,13 @@
       <header class="top-bar">
         <div class="top-brand">
           <span class="top-logo-mark">CH</span>
-          <span class="top-title">CSV</span>
+          <span class="top-title">CSV 2026: Carotid Plaque Segmentation and Vulnerability Assessment in Ultrasound</span>
         </div>
-        <div class="search-box">
-          <input type="search" class="search-input" placeholder="Search CSV 2026">
-          <span class="search-icon">🔍</span>
-        </div>
+      <div class="search-box">
+        <input type="search" id="site-search-input" class="search-input" placeholder="Search CSV 2026" autocomplete="off">
+        <span class="search-icon">🔍</span>
+        <div id="site-search-results" class="site-search-results"></div>
+      </div>
       </header>
 
         <main class="main-content">
@@ -80,5 +82,120 @@
         </main>
     </div>
   </div>
+    <script>
+    // 1) 列出站点所有需要搜索的页面（只填标题和链接即可）
+    const SITE_PAGES = [
+      { title: 'Home',                   url: 'index.html' },
+      { title: 'Registration',           url: 'registration.html' },
+      { title: 'Participate & Submission', url: 'participate.html' },
+      { title: 'Ranking and Scoring',    url: 'ranking.html' },
+      { title: 'Challenge Rules & Policies', url: 'rules.html' },
+      { title: 'Leaderboard',            url: 'leaderboard.html' },
+      { title: 'Organizers',             url: 'organizers.html' },
+      { title: 'Contact Us',             url: 'contact.html' }
+    ];
+
+    async function buildSearchIndex() {
+      const parser = new DOMParser();
+
+      for (const page of SITE_PAGES) {
+        try {
+          const resp = await fetch(page.url);
+          if (!resp.ok) continue;
+
+          const html = await resp.text();
+          const doc  = parser.parseFromString(html, 'text/html');
+
+          const main = doc.querySelector('.main-content') || doc.body;
+          let text   = main.innerText || main.textContent || '';
+
+          text = text.replace(/\s+/g, ' ').trim();
+
+          page.fullText = text.toLowerCase();
+          page.snippet  = text;
+        } catch (e) {
+          console.warn('Fetch failed for', page.url, e);
+        }
+      }
+    }
+
+    // 3) 根据关键字在 title + 正文里做匹配
+    function searchPages(query) {
+      const q = query.trim().toLowerCase();
+      if (!q) return [];
+
+      return SITE_PAGES
+        .filter(p => {
+          const inTitle = p.title.toLowerCase().includes(q);
+          const inText  = p.fullText ? p.fullText.includes(q) : false;
+          return inTitle || inText;         // 标题 or 正文任意命中即可
+        })
+        .map(p => {
+          const snippetSource = p.snippet || p.title;
+          const textLower = snippetSource.toLowerCase();
+          const idx  = textLower.indexOf(q);
+          let snippet;
+
+          if (idx === -1) {
+            snippet = snippetSource.slice(0, 120) +
+                      (snippetSource.length > 120 ? '…' : '');
+          } else {
+            const start = Math.max(0, idx - 40);
+            const end   = Math.min(snippetSource.length, idx + q.length + 80);
+            snippet = (start > 0 ? '…' : '') +
+                      snippetSource.slice(start, end) +
+                      (end < snippetSource.length ? '…' : '');
+          }
+
+          return {
+            title: p.title,
+            url:   p.url,
+            snippet
+          };
+        });
+    }
+
+    // 4) 绑定输入框事件
+    document.addEventListener('DOMContentLoaded', () => {
+      const input  = document.getElementById('site-search-input');
+      const output = document.getElementById('site-search-results');
+
+      // 构建索引（在后台抓取各个页面）
+      buildSearchIndex();
+
+      input.addEventListener('input', function () {
+        const q = this.value;
+
+        if (!q.trim()) {
+          output.innerHTML = '';
+          return;
+        }
+
+        const hits = searchPages(q);
+
+        if (hits.length === 0) {
+          output.innerHTML = '<div class="sr-empty">No results.</div>';
+          return;
+        }
+
+        output.innerHTML = hits.map(p => `
+          <a class="sr-item" href="${p.url}">
+            <div class="sr-title">${p.title}</div>
+            <div class="sr-text">${p.snippet}</div>
+          </a>
+        `).join('');
+      });
+
+      // 回车跳转到第一个结果
+      input.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') {
+          const firstLink = output.querySelector('.sr-item');
+          if (firstLink) {
+            window.location.href = firstLink.href;
+          }
+        }
+      });
+    });
+    </script>
 </body>
 </html>

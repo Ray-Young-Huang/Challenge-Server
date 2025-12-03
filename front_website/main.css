@@ -143,12 +143,15 @@ a:hover {
 
 .top-title {
   font-weight: 600;
+  font-size: 30px;
   color: var(--primary);
 }
 
 /* 搜索框 */
 .search-box {
-  position: relative;
+  position: relative;             /* 作为结果浮层的定位容器 */
+  display: flex;
+  align-items: center;
   max-width: 360px;
   width: 100%;
 }
@@ -249,4 +252,117 @@ a:hover {
     width: 100%;
     max-width: 100%;
   }
+}
+/* 标题样式（上面那句长标题） */
+.schedule-heading {
+  font-family: "Georgia", "Times New Roman", serif;
+  font-size: 22px;
+  font-weight: 600;
+  color: #6b3440;            /* 接近你截图里的暗红色 */
+  margin: 32px 0 24px;
+}
+
+/* 整个时间表容器 */
+.schedule {
+  margin-top: 8px;
+}
+
+/* 每一行（一个阶段） */
+.schedule-item {
+  display: flex;
+  column-gap: 40px;          /* 日期和内容之间的间距 */
+  margin-bottom: 24px;       /* 行间距 */
+}
+
+/* 左侧日期 */
+.schedule-date {
+  min-width: 220px;          /* 日期栏宽度，根据需要可调 */
+  font-size: 18px;
+  color: #555;
+}
+
+/* 右侧标题 + 文本容器 */
+.schedule-body {
+  flex: 1;
+}
+
+/* 阶段标题 */
+.schedule-title {
+  font-family: "Georgia", "Times New Roman", serif;
+  font-size: 20px;
+  font-weight: 600;
+  color: #6b3440;
+  margin-bottom: 4px;
+}
+
+/* 描述文字 */
+.schedule-desc {
+  font-size: 16px;
+  color: #555;
+  line-height: 1.6;
+  text-align: justify;       /* 左右对齐，和你正文保持一致 */
+}
+
+/* 窄屏下的响应式：改成上下排列 */
+@media (max-width: 768px) {
+  .schedule-item {
+    flex-direction: column;
+    row-gap: 4px;
+  }
+
+  .schedule-date {
+    min-width: auto;
+    font-weight: 500;
+  }
+}
+
+/* 下拉结果浮层：紧贴输入框下方，覆盖在内容上，不挤开布局 */
+.site-search-results {
+  position: absolute;
+  top: calc(100% + 4px);          /* 正好在输入框下面，再留 4px 间距 */
+  left: 0;
+  width: 100%;
+
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 8px 16px rgba(15, 23, 42, 0.12);
+  border: 1px solid #e2e1f0;
+  z-index: 999;                   /* 保证浮在图片和正文上面 */
+
+  max-height: 320px;              /* 结果太多时内部滚动 */
+  overflow-y: auto;
+}
+
+/* 结果条目卡片样式 */
+.sr-item {
+  display: block;
+  padding: 8px 12px;
+  text-decoration: none;
+  border-bottom: 1px solid #f1f0fb;
+}
+
+.sr-item:last-child {
+  border-bottom: none;
+}
+
+.sr-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1f2933;
+}
+
+.sr-text {
+  font-size: 12px;
+  color: #6b7280;
+  margin-top: 2px;
+}
+
+.sr-item:hover {
+  background: #f5f4ff;
+}
+
+.sr-empty {
+  padding: 8px 12px;
+  font-size: 12px;
+  color: #6b7280;
 }
