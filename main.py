@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 import secrets
 
 # 导入数据库相关
-from database import init_db, get_db, TeamRegistration, TeamMember, VerificationCode
+from database import init_db, get_db, TeamRegistration, TeamMember, VerificationCode, Submission
 
 # 导入邮件服务
 from email_service import send_verification_email, generate_verification_code
@@ -49,6 +49,12 @@ class LoginData(BaseModel):
     password: str
     rememberMe: bool = False
 
+class SubmissionData(BaseModel):
+    username: str
+    title: str
+    url: str
+    description: str = ""
+
 # 响应模型
 class MemberResponse(BaseModel):
     name: str
@@ -84,6 +90,12 @@ async def serve_verification_page():
 @app.get("/login", response_class=HTMLResponse)
 async def serve_login_page():
     with open("login.html", "r", encoding="utf-8") as f:
+        return f.read()
+
+# 提供个人主页
+@app.get("/dashboard", response_class=HTMLResponse)
+async def serve_dashboard_page():
+    with open("dashboard.html", "r", encoding="utf-8") as f:
         return f.read()
 
 # 第一步：接收注册数据，发送验证码
@@ -293,4 +305,113 @@ async def delete_registration(username: str, db: Session = Depends(get_db)):
     return {
         "status": "success", 
         "message": f"用户 {username} 的注册信息已删除"
+    }
+
+# 获取团队成员信息
+@app.get("/api/team/{username}/members")
+async def get_team_members(username: str, db: Session = Depends(get_db)):
+    team = db.query(TeamRegistration).filter(
+        TeamRegistration.username == username,
+        TeamRegistration.is_verified == True
+    ).first()
+    
+    if not team:
+        raise HTTPException(status_code=404, detail="团队不存在")
+    
+    return {
+        "status": "success",
+        "data": [
+            {
+                "name": member.name,
+                "isLeader": member.isLeader
+            }
+            for member in team.members
+        ]
+    }
+
+# 提交作品链接
+@app.post("/api/submission")
+async def submit_work(data: SubmissionData, db: Session = Depends(get_db)):
+    # 验证用户是否存在
+    user = db.query(TeamRegistration).filter(
+        TeamRegistration.username == data.username,
+        TeamRegistration.is_verified == True
+    ).first()
+    
+    if not user:
+        raise HTTPException(status_code=404, detail="用户不存在或未验证")
+    
+    # 创建提交记录
+    submission = Submission(
+        username=data.username,
+        title=data.title,
+        url=data.url,
+        description=data.description
+    )
+    
+    db.add(submission)
+    db.commit()
+    db.refresh(submission)
+    
+    return {
+        "status": "success",
+        "message": "作品提交成功",
+        "data": {
+            "id": submission.id,
+            "title": submission.title,
+            "url": submission.url,
+            "created_at": submission.created_at.isoformat()
+        }
+    }
+
+# 获取用户的提交历史
+@app.get("/api/submission/{username}")
+async def get_submissions(username: str, db: Session = Depends(get_db)):
+    # 验证用户是否存在
+    user = db.query(TeamRegistration).filter(
+        TeamRegistration.username == username,
+        TeamRegistration.is_verified == True
+    ).first()
+    
+    if not user:
+        raise HTTPException(status_code=404, detail="用户不存在")
+    
+    # 获取该用户的所有提交记录，按时间倒序
+    submissions = db.query(Submission).filter(
+        Submission.username == username
+    ).order_by(Submission.created_at.desc()).all()
+    
+    return {
+        "status": "success",
+        "data": [
+            {
+                "id": sub.id,
+                "title": sub.title,
+                "url": sub.url,
+                "description": sub.description,
+                "created_at": sub.created_at.isoformat()
+            }
+            for sub in submissions
+        ]
+    }
+
+# 获取所有提交记录（管理接口）
+@app.get("/api/submissions/all")
+async def get_all_submissions(db: Session = Depends(get_db)):
+    submissions = db.query(Submission).order_by(Submission.created_at.desc()).all()
+    
+    return {
+        "status": "success",
+        "total": len(submissions),
+        "data": [
+            {
+                "id": sub.id,
+                "username": sub.username,
+                "title": sub.title,
+                "url": sub.url,
+                "description": sub.description,
+                "created_at": sub.created_at.isoformat()
+            }
+            for sub in submissions
+        ]
     }

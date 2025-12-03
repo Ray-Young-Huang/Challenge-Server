@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>CSV 2026 Challenge - Leaderboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- 和首页共用同一个 CSS -->
+  <link rel="stylesheet" href="main.css">
+</head>
+<body>
+  <div class="app-layout">
+    <!-- 左侧栏 -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-logo-mark">CH</div>
+        <span class="sidebar-title">CSV 2026</span>
+      </div>
+
+      <nav class="sidebar-nav">
+        <a href="index.html" class="nav-item">Home</a>
+        <a href="registration.html" class="nav-item">Registration</a>
+        <a href="participate.html" class="nav-item">Participate &amp; Submission</a>
+        <a href="assessment.html" class="nav-item">Ranking and Scoring</a>
+        <a href="rules.html" class="nav-item">Challenge Rules &amp; Policies</a>
+        <a href="leaderboard.html" class="nav-item active">Leaderboard</a>
+        <a href="organizers.html" class="nav-item">Organizers</a>
+        <a href="contact.html" class="nav-item">Contact Us</a>
+      </nav>
+    </aside>
+
+    <!-- 右侧区域 -->
+    <div class="content-area">
+      <!-- 顶部条 -->
+      <header class="top-bar">
+        <div class="top-brand">
+          <span class="top-logo-mark">CH</span>
+          <span class="top-title">CSV</span>
+        </div>
+        <div class="search-box">
+          <input type="search" class="search-input" placeholder="Search CSV 2026">
+          <span class="search-icon">🔍</span>
+        </div>
+      </header>
+
+        <main class="main-content">
+        <h1 class="page-title">Leaderboard</h1>
+
+        <p>
+            The leaderboard will display the performance of all submitted methods on the hidden
+            test set. For each team, only the best submission will be shown.
+        </p>
+
+        <h2 class="subtitle">Live leaderboard</h2>
+        <p>
+            During the development phase, a provisional leaderboard based on the validation set
+            may be provided. The final ranking will be computed on the test set after the
+            submission deadline.
+        </p>
+
+        <!-- 这里将来可以用表格或 JS 动态加载成绩 -->
+        <table class="lb-table">
+            <thead>
+            <tr>
+                <th>Rank</th>
+                <th>Team</th>
+                <th>Institution</th>
+                <th>Score</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>1</td>
+                <td>Example Team</td>
+                <td>Example University</td>
+                <td>0.000</td>
+            </tr>
+            <!-- 更多行由你以后填充 -->
+            </tbody>
+        </table>
+        </main>
+    </div>
+  </div>
+</body>
+</html>

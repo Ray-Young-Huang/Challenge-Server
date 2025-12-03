@@ -59,6 +59,20 @@ class VerificationCode(Base):
     expires_at = Column(DateTime, nullable=False)
     is_used = Column(Boolean, default=False)
 
+# 作品提交表
+class Submission(Base):
+    __tablename__ = "submissions"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    username = Column(String, ForeignKey("team_registrations.username"), nullable=False, index=True)
+    title = Column(String, nullable=False)
+    url = Column(String, nullable=False)
+    description = Column(String, default="")
+    created_at = Column(DateTime, default=datetime.utcnow)
+    
+    # 关联团队
+    team = relationship("TeamRegistration", foreign_keys=[username], backref="submissions")
+
 # 创建所有表
 def init_db():
     Base.metadata.create_all(bind=engine)

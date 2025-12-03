@@ -1,0 +1,252 @@
+:root {
+  --primary: #4b6cff;
+  --sidebar-bg: #f7f6fb;
+  --sidebar-border: #e2e1f0;
+  --text-main: #222222;
+  --text-muted: #555555;
+  --link: #4b6cff;
+}
+
+/* 全局基础样式 */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui,
+    sans-serif;
+  color: var(--text-main);
+  background: #ffffff;
+}
+
+a {
+  color: var(--link);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* 布局 */
+.app-layout {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* 左侧栏加宽 */
+.sidebar {
+  width: 260px;
+  background: var(--sidebar-bg);
+  border-right: 1px solid var(--sidebar-border);
+  padding: 24px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+
+  /* 关键：滚动时固定在视口左侧 */
+  position: sticky;
+  top: 0;
+  align-self: flex-start;
+  height: 100vh;       /* 占满屏幕高度 */
+  overflow-y: auto;    /* 菜单很多时，侧栏内部可以单独滚动 */
+}
+
+/* 左上角标题 */
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sidebar-logo-mark {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.sidebar-title {
+  font-weight: 700;
+  font-size: 20px;
+  color: var(--primary);
+}
+
+/* 左侧导航 */
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 20px;
+}
+
+.nav-item {
+  display: block;
+  padding: 8px 10px;
+  border-radius: 8px;
+  color: #505060;
+}
+
+.nav-item:hover {
+  background: #ecebfb;
+}
+
+.nav-item.active {
+  background: #ffffff;
+  color: var(--primary);
+  font-weight: 600;
+  border-left: 3px solid var(--primary);
+  padding-left: 7px;
+}
+
+/* 右侧区域 */
+.content-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+/* 顶部栏 */
+.top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 32px;
+  border-bottom: 1px solid #ececf3;
+}
+
+.top-brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.top-logo-mark {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 2px solid var(--primary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  color: var(--primary);
+}
+
+.top-title {
+  font-weight: 600;
+  color: var(--primary);
+}
+
+/* 搜索框 */
+.search-box {
+  position: relative;
+  max-width: 360px;
+  width: 100%;
+}
+
+.search-input {
+  width: 100%;
+  padding: 8px 34px 8px 14px;
+  border-radius: 999px;
+  border: 1px solid #d5d5e5;
+  font-size: 14px;
+  outline: none;
+}
+
+.search-input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(75, 108, 255, 0.2);
+}
+
+.search-icon {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 16px;
+  color: #a0a0b5;
+  pointer-events: none;
+}
+
+/* 正文区域 */
+.main-content {
+  max-width: 1200px;          /* 正文最大宽度 */
+  margin: 32px auto 64px;
+  padding: 0 32px;
+}
+
+.page-title {
+  font-size: 30px;
+  font-weight: 600;
+  margin: 0 0 20px;
+}
+
+/* 横幅图片：自定义大小 + 居中 */
+.hero-center {
+  text-align: center;          /* 让图片居中 */
+  margin: 8px 0 28px;
+}
+
+/*
+ * 这里就是图片大小控制：
+ * - width: 900px      → 正常情况下的“理想”宽度，你可以随意改，比如 800、1000
+ * - max-width: calc(100vw - 320px)
+ *   100vw  是视口宽度
+ *   320px ≈ 左侧栏260px + 右侧内边距/安全间距
+ *   这样可以防止太窄屏幕时出现横向滚动条
+ */
+.hero-img {
+  display: inline-block;
+  width: 1100px;                         /* ✅ 自定义大小，想多大改这里 */
+  max-width: calc(100vw - 320px);       /* ✅ 窄屏时自动缩小，避免横向滚动 */
+  height: auto;
+  border-radius: 10px;                  /* 可选：圆角 */
+}
+
+/* 副标题 & 正文文字 */
+.subtitle {
+  font-size: 25px;
+  font-weight: 600;
+  margin: 0 0 16px;
+}
+
+.main-content p {
+  font-size: 18px;
+  line-height: 1.7;
+  color: var(--text-muted);
+  margin: 0 0 14px;
+  text-align: justify;
+  text-justify: inter-word;  
+}
+
+/* 响应式：窗口非常窄时（比如平板/手机）简单调整一下布局 */
+@media (max-width: 900px) {
+  .app-layout {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    width: 100%;
+    flex-direction: row;
+    align-items: flex-start;
+    overflow-x: auto;
+  }
+
+  .main-content {
+    padding: 0 16px;
+  }
+
+  .hero-img {
+    width: 100%;
+    max-width: 100%;
+  }
+}

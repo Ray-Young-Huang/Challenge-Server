@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>CSV 2026 Challenge - Participate and Submission</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- 和首页共用同一个 CSS -->
+  <link rel="stylesheet" href="main.css">
+</head>
+<body>
+  <div class="app-layout">
+    <!-- 左侧栏 -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-logo-mark">CH</div>
+        <span class="sidebar-title">CSV 2026</span>
+      </div>
+
+      <nav class="sidebar-nav">
+        <a href="index.html" class="nav-item">Home</a>
+        <a href="registration.html" class="nav-item">Registration</a>
+        <a href="participate.html" class="nav-item active">Participate &amp; Submission</a>
+        <a href="assessment.html" class="nav-item">Ranking and Scoring</a>
+        <a href="rules.html" class="nav-item">Challenge Rules &amp; Policies</a>
+        <a href="leaderboard.html" class="nav-item">Leaderboard</a>
+        <a href="organizers.html" class="nav-item">Organizers</a>
+        <a href="contact.html" class="nav-item">Contact Us</a>
+      </nav>
+    </aside>
+
+    <!-- 右侧区域 -->
+    <div class="content-area">
+      <!-- 顶部条 -->
+      <header class="top-bar">
+        <div class="top-brand">
+          <span class="top-logo-mark">CH</span>
+          <span class="top-title">CSV</span>
+        </div>
+        <div class="search-box">
+          <input type="search" class="search-input" placeholder="Search CSV 2026">
+          <span class="search-icon">🔍</span>
+        </div>
+      </header>
+
+        <main class="main-content">
+          <h1>Participantion and Sumission</h1>
+          <p style="text-align: justify;">
+              Participants are required to submit a Docker image that contains a single model capable of performing 
+              multi-task processing on carotid artery plaques. The task types include segmentation and classification.
+          </p>
+
+          
+
+          <h3>Dataset Structure</h3>
+          <ul>
+          <li>
+              train/
+              <ul>
+              <li>
+                  img/
+                  <ul>
+                  <li>001.h5</li>
+                  <li>002.h5</li>
+                  <li>003.h5</li>
+                  <li>...</li>
+                  </ul>
+              </li>
+              <li>
+                  mask/
+                  <ul>
+                  <li>001_label.h5</li>
+                  <li>002_label.h5</li>
+                  <li>003_label.h5</li>
+                  <li>...</li>
+                  </ul>
+              </li>
+              <li>
+                  train.list
+              </li>
+              </ul>
+          </li>
+          </ul>
+
+          <h3>Code Structure</h3>
+          <ul>
+          <li>
+              Code/
+              <ul>
+              <li>
+                  augmentations/
+                  <ul>
+                  <li>ctaugment.py</li>
+                  </ul>
+              </li>
+              <li>
+                  utils/
+                  <ul>
+                  <li>vis_utils.py</li>
+                  <li>util.py</li>
+                  <li>ramps.py</li>
+                  <li>eval_utils.py</li>
+                  <li>losses.py</li>
+                  </ul>
+              </li>
+              <li>
+                  unet.py
+              </li>
+              <li>
+                  test.py
+              </li>
+              <li>
+                  train.py
+              </li>
+              </ul>
+          </li>
+          </ul>
+          <p style="text-align: justify; padding-left: 2em; padding-right: 2em;">
+              For the usage of Baseline, please refer to the readme.md file in the root directory of the project documentation.
+          </p>
+
+          <h3>Baseline and Submission Format</h3>
+          <p style="text-align: justify; padding-left: 2em; padding-right: 2em;">
+              Participants can get the baseline by the following channel <b>(Including necessary guidelines)</b>:
+              <a href="about:blank" target="Baseline">Baseline</a>
+          </p>
+          <h4 style="padding-left: 2em;">Submission File Structure</h4>
+          <ul>
+          <li>
+              docker_submission_template/
+              <ul>
+              <li>
+                  models/
+                  <ul>
+                  <li>model.py</li>
+                  </ul>
+              </li>
+              <li>
+                  weights/
+                  <ul>
+                  <li>best_model.pth</li>
+                  </ul>
+              </li>
+              <li>
+                  Dockerfile
+              </li>
+              <li>
+                  requirements.txt
+              </li>
+              <li>
+                  run_infer.py
+              </li>
+              </ul>
+          </li>
+          </ul>
+          <h3>How to Submit</h3>
+          <p style="text-align: justify; padding-left: 2em; padding-right: 2em;">
+              Please send an email to <EMAIL> with the subject "F: Dataset Submission" and attach your submission file.
+          </p>
+        </main>
+    </div>
+  </div>
+</body>
+</html>

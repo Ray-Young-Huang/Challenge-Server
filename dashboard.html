@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>个人主页 - 挑战赛</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+            min-height: 100vh;
+        }
+
+        /* 顶部导航栏 */
+        .navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar-title {
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .navbar-user {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-name {
+            font-size: 14px;
+        }
+
+        .logout-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 8px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        /* 主容器 */
+        .main-container {
+            display: flex;
+            gap: 30px;
+            padding: 30px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* 左侧团队信息 */
+        .team-info-section {
+            flex: 0 0 350px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+            padding: 25px;
+            margin-bottom: 20px;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #667eea;
+        }
+
+        .info-group {
+            margin-bottom: 18px;
+        }
+
+        .info-label {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        .info-value {
+            font-size: 15px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .team-name {
+            color: #667eea;
+            font-size: 20px;
+        }
+
+        .member-list {
+            list-style: none;
+        }
+
+        .member-item {
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .member-name {
+            color: #333;
+            font-size: 14px;
+        }
+
+        .leader-badge {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+        }
+
+        /* 右侧提交区域 */
+        .submission-section {
+            flex: 1;
+        }
+
+        .submit-form {
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        textarea.form-input {
+            min-height: 100px;
+            resize: vertical;
+            font-family: inherit;
+        }
+
+        .submit-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .submit-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(102, 126, 234, 0.3);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* 提交历史 */
+        .submission-history {
+            margin-top: 30px;
+        }
+
+        .history-item {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 12px;
+            border-left: 4px solid #667eea;
+            transition: all 0.3s ease;
+        }
+
+        .history-item:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transform: translateX(5px);
+        }
+
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .history-title {
+            font-weight: 600;
+            color: #333;
+            font-size: 15px;
+        }
+
+        .history-time {
+            font-size: 12px;
+            color: #999;
+        }
+
+        .history-link {
+            color: #667eea;
+            font-size: 14px;
+            word-break: break-all;
+            text-decoration: none;
+        }
+
+        .history-link:hover {
+            text-decoration: underline;
+        }
+
+        .history-description {
+            color: #666;
+            font-size: 13px;
+            margin-top: 5px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+
+        .empty-icon {
+            font-size: 64px;
+            margin-bottom: 15px;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 968px) {
+            .main-container {
+                flex-direction: column;
+            }
+
+            .team-info-section {
+                flex: 1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 12px 15px;
+            }
+
+            .navbar-title {
+                font-size: 18px;
+            }
+
+            .main-container {
+                padding: 15px;
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部导航栏 -->
+    <div class="navbar">
+        <div class="navbar-title">🏆 挑战赛平台</div>
+        <div class="navbar-user">
+            <span class="user-name" id="navUsername">加载中...</span>
+            <button class="logout-btn" onclick="logout()">退出登录</button>
+        </div>
+    </div>
+
+    <!-- 主内容区 -->
+    <div class="main-container">
+        <!-- 左侧：团队信息 -->
+        <div class="team-info-section">
+            <div class="card">
+                <h2 class="card-title">团队信息</h2>
+                <div class="info-group">
+                    <div class="info-label">团队名称</div>
+                    <div class="info-value team-name" id="teamName">加载中...</div>
+                </div>
+                <div class="info-group">
+                    <div class="info-label">所属组织</div>
+                    <div class="info-value" id="organization">加载中...</div>
+                </div>
+                <div class="info-group">
+                    <div class="info-label">联系邮箱</div>
+                    <div class="info-value" id="email">加载中...</div>
+                </div>
+                <div class="info-group">
+                    <div class="info-label">用户名</div>
+                    <div class="info-value" id="username">加载中...</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2 class="card-title">团队成员</h2>
+                <ul class="member-list" id="memberList">
+                    <li class="member-item">
+                        <span class="member-name">加载中...</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- 右侧：提交链接 -->
+        <div class="submission-section">
+            <div class="card">
+                <h2 class="card-title">提交作品链接</h2>
+                <form class="submit-form" id="submitForm">
+                    <div class="form-group">
+                        <label class="form-label" for="linkTitle">作品标题 *</label>
+                        <input type="text" class="form-input" id="linkTitle" required placeholder="请输入作品标题">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="linkUrl">作品链接 *</label>
+                        <input type="url" class="form-input" id="linkUrl" required placeholder="https://example.com/your-project">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="linkDescription">作品描述</label>
+                        <textarea class="form-input" id="linkDescription" placeholder="简要描述您的作品（可选）"></textarea>
+                    </div>
+                    <button type="submit" class="submit-btn" id="submitBtn">提交作品</button>
+                </form>
+            </div>
+
+            <div class="card submission-history">
+                <h2 class="card-title">提交历史</h2>
+                <div id="historyList">
+                    <div class="empty-state">
+                        <div class="empty-icon">📝</div>
+                        <p>暂无提交记录</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 用户数据
+        let userData = null;
+
+        // 页面加载时获取用户信息
+        window.addEventListener('DOMContentLoaded', async () => {
+            // 检查是否已登录
+            const token = localStorage.getItem('token');
+            const userDataStr = localStorage.getItem('userData');
+
+            if (!token || !userDataStr) {
+                alert('请先登录');
+                window.location.href = '/login';
+                return;
+            }
+
+            // 解析用户数据
+            userData = JSON.parse(userDataStr);
+            
+            // 显示用户信息
+            displayUserInfo();
+            
+            // 加载团队成员
+            await loadTeamMembers();
+            
+            // 加载提交历史
+            await loadSubmissionHistory();
+        });
+
+        // 显示用户信息
+        function displayUserInfo() {
+            document.getElementById('navUsername').textContent = userData.username;
+            document.getElementById('teamName').textContent = userData.teamName;
+            document.getElementById('organization').textContent = userData.organization;
+            document.getElementById('email').textContent = userData.email;
+            document.getElementById('username').textContent = userData.username;
+        }
+
+        // 加载团队成员
+        async function loadTeamMembers() {
+            try {
+                const response = await fetch(`/api/team/${userData.username}/members`);
+                const result = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(result.detail || '加载成员失败');
+                }
+
+                const memberList = document.getElementById('memberList');
+                if (result.data && result.data.length > 0) {
+                    memberList.innerHTML = result.data.map(member => `
+                        <li class="member-item">
+                            <span class="member-name">${member.name}</span>
+                            ${member.isLeader ? '<span class="leader-badge">队长</span>' : ''}
+                        </li>
+                    `).join('');
+                } else {
+                    memberList.innerHTML = '<li class="member-item"><span class="member-name">暂无成员</span></li>';
+                }
+            } catch (error) {
+                console.error('加载成员失败:', error);
+            }
+        }
+
+        // 提交作品
+        document.getElementById('submitForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const title = document.getElementById('linkTitle').value.trim();
+            const url = document.getElementById('linkUrl').value.trim();
+            const description = document.getElementById('linkDescription').value.trim();
+
+            if (!title || !url) {
+                alert('请填写作品标题和链接');
+                return;
+            }
+
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = true;
+            submitBtn.textContent = '提交中...';
+
+            try {
+                const response = await fetch('/api/submission', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    },
+                    body: JSON.stringify({
+                        username: userData.username,
+                        title: title,
+                        url: url,
+                        description: description
+                    })
+                });
+
+                const result = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(result.detail || '提交失败');
+                }
+
+                alert('✅ 作品提交成功！');
+                
+                // 清空表单
+                document.getElementById('linkTitle').value = '';
+                document.getElementById('linkUrl').value = '';
+                document.getElementById('linkDescription').value = '';
+
+                // 重新加载提交历史
+                await loadSubmissionHistory();
+
+            } catch (error) {
+                console.error('提交失败:', error);
+                alert('提交失败：' + error.message);
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = '提交作品';
+            }
+        });
+
+        // 加载提交历史
+        async function loadSubmissionHistory() {
+            try {
+                const response = await fetch(`/api/submission/${userData.username}`);
+                const result = await response.json();
+
+                const historyList = document.getElementById('historyList');
+
+                if (result.data && result.data.length > 0) {
+                    historyList.innerHTML = result.data.map(item => `
+                        <div class="history-item">
+                            <div class="history-header">
+                                <div class="history-title">${item.title}</div>
+                                <div class="history-time">${formatTime(item.created_at)}</div>
+                            </div>
+                            <a href="${item.url}" target="_blank" class="history-link">${item.url}</a>
+                            ${item.description ? `<div class="history-description">${item.description}</div>` : ''}
+                        </div>
+                    `).join('');
+                } else {
+                    historyList.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-icon">📝</div>
+                            <p>暂无提交记录</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('加载提交历史失败:', error);
+            }
+        }
+
+        // 格式化时间
+        function formatTime(dateString) {
+            const date = new Date(dateString);
+            const now = new Date();
+            const diff = now - date;
+            const minutes = Math.floor(diff / 60000);
+            const hours = Math.floor(diff / 3600000);
+            const days = Math.floor(diff / 86400000);
+
+            if (minutes < 1) return '刚刚';
+            if (minutes < 60) return `${minutes}分钟前`;
+            if (hours < 24) return `${hours}小时前`;
+            if (days < 7) return `${days}天前`;
+            
+            return date.toLocaleDateString('zh-CN');
+        }
+
+        // 退出登录
+        function logout() {
+            if (confirm('确定要退出登录吗？')) {
+                localStorage.removeItem('token');
+                localStorage.removeItem('userData');
+                window.location.href = '/login';
+            }
+        }
+    </script>
+</body>
+</html>

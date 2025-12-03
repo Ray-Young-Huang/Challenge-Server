@@ -277,15 +277,13 @@
                     throw new Error(result.detail || '登录失败');
                 }
 
-                // 登录成功
-                alert('登录成功！');
-                
-                // 保存token或session
+                // 登录成功，保存token和用户数据
                 if (result.token) {
                     localStorage.setItem('token', result.token);
                 }
+                localStorage.setItem('userData', JSON.stringify(result.data));
 
-                // 跳转到主页或仪表板
+                // 直接跳转到个人主页
                 window.location.href = '/dashboard';
 
             } catch (error) {

@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>CSV 2026 Challenge</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- 外部样式 -->
+  <link rel="stylesheet" href="main.css">
+</head>
+<body>
+  <div class="app-layout">
+    <!-- 左侧栏 -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-logo-mark">CH</div>
+        <span class="sidebar-title">CSV 2026</span>
+      </div>
+
+      <nav class="sidebar-nav">
+        <a href="index.html" class="nav-item active">Home</a>
+        <a href="registration.html" class="nav-item">Registration</a>
+        <a href="participate.html" class="nav-item">Participate &amp; Submission</a>
+        <a href="assessment.html" class="nav-item">Ranking and Scoring</a>
+        <a href="rules.html" class="nav-item">Challenge Rules &amp; Policies</a>
+        <a href="leaderboard.html" class="nav-item">Leaderboard</a>
+        <a href="organizers.html" class="nav-item">Organizers</a>
+        <a href="contact.html" class="nav-item">Contact Us</a>
+      </nav>
+    </aside>
+
+    <!-- 右侧主区域 -->
+    <div class="content-area">
+      <!-- 顶部栏 -->
+      <header class="top-bar">
+        <div class="top-brand">
+          <span class="top-logo-mark">CH</span>
+          <span class="top-title">CSV</span>
+        </div>
+        <div class="search-box">
+          <input type="search" class="search-input" placeholder="Search CSV 2026">
+          <span class="search-icon">🔍</span>
+        </div>
+      </header>
+
+      <!-- 正文 -->
+      <main class="main-content">
+        <h1 class="page-title">CSV 2026 Challenge</h1>
+
+        <!-- 横幅图片：自定义大小 + 居中 -->
+        <div class="hero-center">
+          <img
+            src="ban.png"
+            alt="CSV 2026 Challenge banner"
+            class="hero-img">
+        </div>
+
+        <h2 class="subtitle">
+          What is This Challenge?
+        </h2>
+
+        <p>
+          Stroke remains a major global health burden, ranking as the second leading cause of death 
+          and the leading cause of long-term disability. Ischemic stroke accounts for nearly 71% of 
+          all cases, with cervical artery atherosclerosis serving as a key etiological factor. Owing 
+          to its real-time, low-cost, and widely accessible nature, carotid ultrasound plays a crucial 
+          role in evaluating plaque morphology and identifying high-risk lesions at an early stage.</br>
+          Carotid plaques contribute to stroke through two principal mechanisms: (1) progressive plaque 
+          growth leading to luminal stenosis, and (2) plaque rupture resulting in thromboembolism. As such, 
+          accurate assessment of plaque morphology and vulnerability is critical for stroke prevention and 
+          clinical management. However, evaluation of plaque vulnerability is highly operator-dependent and 
+          particularly challenging for less experienced clinicians. With the increasing demand for carotid 
+          ultrasound screening, automated methods for plaque segmentation and vulnerability classification have 
+          become essential to support efficient and equitable clinical care.</br>
+        </p>
+        
+        <h2 class="subtitle">
+            Aims of This Challenge
+        </h2>
+        <p>
+        The challenge aims to advance intelligent algorithms for comprehensive carotid plaque assessment. 
+        Participants are expected to develop methods capable of:
+        </p>
+        <ul style="margin-left: 80px;">
+            <li>Segmenting plaque and vascular structures to automatically quantify luminal stenosis.</li>
+            <li>Classifying plaque vulnerability to estimate rupture risk.</li>
+        </ul>
+        <p>
+            These automated solutions are anticipated to enhance clinical decision-making, reduce clinician workload, 
+            and provide scalable diagnostic support for resource-limited regions.
+        </p>
+                <h2 class="subtitle">
+            Dataset of This Challenge
+        </h2>
+        <p>
+            Our dataset comprises a large-scale carotid ultrasound dataset with <strong>1,500 paired cases</strong>, 
+            each containing longitudinal and transverse B-mode images. The dataset was collected from a <strong>prospective study</strong> 
+            involving 7 hospitals and 4 major ultrasound machine vendors, all following standardized 
+            acquisition protocols to ensure high diversity and robust generalization across clinical settings. 
+        </p>
+        <p>
+            Among all cases: 
+        </p>
+        <ul style="margin-left: 80px;">
+            <li class="bodyText" style="list-style-type: disc;"><strong>1,000 pairs</strong> are provided for training</li>
+            <li class="bodyText" style="list-style-type: disc;"><strong>200 pairs</strong> for validation</li>
+            <li class="bodyText" style="list-style-type: disc;"><strong>300 hidden pairs</strong> are reserved for testing</li>
+        </ul>
+        <p>
+        Each case includes two view-level segmentation masks and one instance-level classification label 
+        (low-risk or high-risk). We provide <strong>all training images and annotations for 10% of cases</strong> for model development in this semi-supervised task.
+        To our knowledge, this is the first and largest paired carotid plaque ultrasound dataset</strong>, 
+        enabling benchmarking of both segmentation and classification methods under real-world clinical variability.
+        </p>
+        <div class="hero-center">
+          <img
+            src= "Dataset.png"
+            alt="Dataset"
+            class="hero-img">
+        </div>
+      </main>
+    </div>
+  </div>
+</body>
+</html>

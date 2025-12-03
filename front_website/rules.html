@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>CSV 2026 Challenge - Rules</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- 和首页共用同一个 CSS -->
+  <link rel="stylesheet" href="main.css">
+</head>
+<body>
+  <div class="app-layout">
+    <!-- 左侧栏 -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-logo-mark">CH</div>
+        <span class="sidebar-title">CSV 2026</span>
+      </div>
+
+      <nav class="sidebar-nav">
+        <a href="index.html" class="nav-item">Home</a>
+        <a href="registration.html" class="nav-item">Registration</a>
+        <a href="participate.html" class="nav-item">Participate &amp; Submission</a>
+        <a href="assessment.html" class="nav-item">Ranking and Scoring</a>
+        <a href="rules.html" class="nav-item active">Challenge Rules &amp; Policies</a>
+        <a href="leaderboard.html" class="nav-item">Leaderboard</a>
+        <a href="organizers.html" class="nav-item">Organizers</a>
+        <a href="contact.html" class="nav-item">Contact Us</a>
+      </nav>
+    </aside>
+
+    <!-- 右侧区域 -->
+    <div class="content-area">
+      <!-- 顶部条 -->
+      <header class="top-bar">
+        <div class="top-brand">
+          <span class="top-logo-mark">CH</span>
+          <span class="top-title">CSV</span>
+        </div>
+        <div class="search-box">
+          <input type="search" class="search-input" placeholder="Search CSV 2026">
+          <span class="search-icon">🔍</span>
+        </div>
+      </header>
+      <main class="main-content">
+        <h1 class="page-title">Challenge Rules</h1>
+
+        <h2 class="subtitle">Methods</h2>
+        <p>
+          Participants can build their own methods based on existing open-source general models, and the 
+          competition is participated in online. The testing of this project will be conducted using our 
+          private dataset. In addition, participants are required to submit a document to the International 
+          Symposium on Biomedical Imaging (ISBI) challenge, introducing the details of their research methods 
+          and elaborating on innovative points in preprocessing, model architecture, or post-processing.
+        </p>
+
+        <h2 class="subtitle">Use of Training Data and Models</h2>
+        <p>
+          Publicly available pre trained models can be used, but to ensure fairness and reproducibility of the 
+          results, the use of unpublished pre trained models is prohibited. Participants are not allowed to use 
+          any dataset other than the dataset provided by us
+        </p>
+
+        <h2 class="subtitle">Prohibit Participants from Using Ensemble Learning</h2>
+        <p>
+          Ensemble learning improves performance by combining multiple base learners, but it tends to mask the model 
+          design flaws and hyperparameter tuning shortcomings of individual models. To more accurately assess participants' 
+          true capabilities in core aspects such as feature engineering, model structure design, and hyperparameter tuning, 
+          and to guide everyone to focus on the performance and innovative ideas of the models themselves, this rule is hereby 
+          established. Participants who have used ensemble learning will not appear on the leaderboard.
+        </p>
+
+        <h2 class="subtitle">Obligations of Participants</h2>
+        <p>
+          Participants must fulfill the following obligations; otherwise, they will not be eligible for ranking, participation 
+          in the challenge winner selection, or any other awards:
+        </p>
+        <ul>
+        <li>Present their research methods at the final event of the challenge held during the 2026 International Symposium on Biomedical Imaging (ISBI).</li>
+        <li>Submit a paper that reports the details of the research methods, with a length limit of no more than 5 pages.</li>
+        <li>Sign and return all prize confirmation documents required by the competition sponsors/organizers.</li>
+        <li>Commit to citing the papers related to this data challenge and the data overview paper whenever submitting the developed methods to scientific or non-scientific publications.</li>
+        <li>Ensure that the dataset provided in this challenge is not used for commercial purposes.</li>
+      </ul>
+      </main>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>CSV 2026 Challenge - Assessment</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- 和首页共用同一个 CSS -->
+  <link rel="stylesheet" href="main.css">
+    <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      svg: { fontCache: 'global' }
+    };
+  </script>
+
+  <!-- 载入 MathJax v3 -->
+  <script id="MathJax-script" async
+          src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+  </script>
+</head>
+<body>
+  <div class="app-layout">
+    <!-- 左侧栏 -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-logo-mark">CH</div>
+        <span class="sidebar-title">CSV 2026</span>
+      </div>
+
+      <nav class="sidebar-nav">
+        <a href="index.html" class="nav-item">Home</a>
+        <a href="registration.html" class="nav-item">Registration</a>
+        <a href="participate.html" class="nav-item">Participate &amp; Submission</a>
+        <a href="assessment.html" class="nav-item active">Ranking and Scoring</a>
+        <a href="rules.html" class="nav-item">Challenge Rules &amp; Policies</a>
+        <a href="leaderboard.html" class="nav-item">Leaderboard</a>
+        <a href="organizers.html" class="nav-item">Organizers</a>
+        <a href="contact.html" class="nav-item">Contact Us</a>
+      </nav>
+    </aside>
+
+    <!-- 右侧区域 -->
+    <div class="content-area">
+      <!-- 顶部条 -->
+      <header class="top-bar">
+        <div class="top-brand">
+          <span class="top-logo-mark">CH</span>
+          <span class="top-title">CSV</span>
+        </div>
+        <div class="search-box">
+          <input type="search" class="search-input" placeholder="Search CSV 2026">
+          <span class="search-icon">🔍</span>
+        </div>
+      </header>
+
+        <main class="main-content">
+        <h1 class="page-title">Ranking and Scoring</h1>
+        <h3>Key requirements for the ranking process:</h3>
+        <p class="bodyText">
+            The final rankings were determined by a weighted combination of three components: Classification score: 
+            40% weight, Segmentation score: 40% weight, and Processing Time score: 20% weight. Considering that the 
+            objective of this task is to comprehensively evaluate the risk of carotid plaques through both classification 
+            and segmentation, we deemed classification and segmentation to be more critical than processing time, 
+            higher weights are assigned to these two aspects compared to processing time. This comprehensive evaluation 
+            aligns with the challenge’s objective to assess both segmentation, classification, and computational 
+            performance, ensuring a multi-dimensional assessment of participants’ solutions. The overall score is calculated as follows:
+        </p>
+        <p>
+          $$ S_{\text{total}} = 0.4\,S_{\text{cls}} + 0.4\,S_{\text{seg}} + 0.2\,S_{\text{time}} $$
+        </p>
+
+        <p class="bodyText">
+            Where $ S_{\text{cls}} $ represents classification score, $ S_{\text{seg}} $ represents segmentation score, and $ S_{\text{time}} $ represents 
+            processing time score. Figure 1 illustrates the overall score framework of our challenge.
+        </p>
+        <br>
+        <p class="bodyText">
+            <b>1. Classification Score: </b>Class imbalance is an inherent issue in this task. To comprehensively evaluate 
+            classification performance, we adopt the mean F1-score across all classes as the final classification score. 
+            The calculation formula is as follows:
+        </p>
+        $$
+        S_{Cls} = \frac{1}{N} \sum_{n=1}^{N} F_{1_i}
+        $$
+        <p class="bodyText">
+            Where $ N $ denotes the total number of classes.
+        </p>
+        <br>
+        <p class="bodyText">
+            <b>2. Segmentation Score: </b>As shown in Figure 1, in the semi-supervised segmentation task, segmentation 
+            score is calculated by both the vessel and plaque of the longitudinal and transverse views, each contributing 
+            50% to the overall segmentation score. 
+        </p>
+        <p class="bodyText">
+            For each view, the score is calculated based on two evaluation metrics — Dice Similarity Coefficient (DSC) 
+            and Normalized Surface Dice (NSD) — which are equally weighted (50%). Considering that accurate plaque segmentation 
+            is more clinically important than vessel segmentation, we assign a weight of 40% to the vessel and 60% to the plaque. 
+            The segmentation score is calculated as follows:
+        </p>
+          $$
+          S_{\text{seg}}
+          = \frac{1}{2}
+          \sum_{v \in \{\text{long},\,\text{trans}\}}
+          \Big( 0.4\, S_{v,\text{vessel}} + 0.6\, S_{v,\text{plaque}} \Big)
+          $$
+        <p class="bodyText">
+            Where
+            $$
+              S_{v,\text{vessel}} =
+              \frac{DSC_{v,\text{vessel}} + NSD_{v,\text{vessel}}}{2},
+              \quad
+              S_{v,\text{plaque}} =
+              \frac{DSC_{v,\text{plaque}} + NSD_{v,\text{plaque}}}{2}
+              $$
+        </p>
+        <p class="bodyText">
+            Here, $ v $ denotes the view type (longitudinal and transverse).
+        </p>
+        <br>
+        <p class="bodyText">
+            <b>3. Processing Time Score: </b>The processing time score is calculated based on the participant's 
+            inference time relative to a baseline time. The scoring rules are as follows:
+        </p>
+        <ul style="margin-left: 80px;">
+            <li class="bodyText" style="list-style-type: disc;">If a participant's time was \( \leq 2/3 \) of the baseline time, their time usage was set to 
+                <strong>\( -(2/3 \times \text{baseline time}) \)</strong>.</li>
+            <li class="bodyText" style="list-style-type: disc;">If a participant's time was \( \geq 2 \) of the baseline time, their time usage was set to 
+                <strong>\( -(2 \times \text{baseline time}) \)</strong>.</li>
+            <li class="bodyText" style="list-style-type: disc;">Otherwise, it was set to <strong>\( -(\text{total time})\)</strong>.</li>
+        </ul>
+        <p class="bodyText">
+            After min-max normalization and score transformation was applied to yield a [0, 100] score. 
+        </p>    
+        <p class="bodyText">
+            The processing time score is calculated as follows:
+        </p>
+        $$
+        S_{time} = \frac{(-t_{user}) - (-T_{max})}{(-T_{min}) - (-T_{max})} \times 100
+        $$
+        <p>
+          Where
+        </p>
+        <ul style="margin-left: 80px;">
+            <li class="bodyText" style="list-style-type: disc;">\( t_{user} \) is the participant's (clipped) total time usage.</li>
+            <li class="bodyText" style="list-style-type: disc;">\( T_{min} = 2/3 \times \) baseline time is the fastest acceptable case (upper bound).</li>
+            <li class="bodyText" style="list-style-type: disc;">\( T_{max} = 2 \times \) baseline time is the slowest acceptable case (lower bound).</li>
+        </ul>
+        <p class="bodyText">
+            The baseline runtime will be released together with the dataset. 
+        </p>
+        <div class="hero-center">
+          <img
+            src= "Dataset.jpg"
+            alt="Dataset"
+            class="hero-img">
+        </div>
+        <p>
+          Each case includes B-mode carotid ultrasound images from two views: the longitudinal and transverse. For each 
+          case, segmentation results should be provided separately for both views, while a single classification result 
+          should be generated based on the combined information from both views.
+        </p>
+        </main>
+    </div>
+  </div>
+</body>
+</html>
