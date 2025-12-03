@@ -1,7 +1,8 @@
-from sqlalchemy import create_engine, Column, Integer, String, Boolean, ForeignKey
+from sqlalchemy import create_engine, Column, Integer, String, Boolean, ForeignKey, DateTime
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship
 from sqlalchemy.pool import StaticPool
+from datetime import datetime
 
 # SQLite数据库文件路径
 SQLALCHEMY_DATABASE_URL = "sqlite:///./challenge_server.db"
@@ -30,6 +31,8 @@ class TeamRegistration(Base):
     email = Column(String, unique=True, nullable=False, index=True)
     username = Column(String, unique=True, nullable=False, index=True)
     password = Column(String, nullable=False)  # 实际应用中应该加密存储
+    is_verified = Column(Boolean, default=False)  # 邮箱是否已验证
+    created_at = Column(DateTime, default=datetime.utcnow)
     
     # 关联成员
     members = relationship("TeamMember", back_populates="team", cascade="all, delete-orphan")
@@ -44,6 +47,17 @@ class TeamMember(Base):
     
     # 关联团队
     team = relationship("TeamRegistration", back_populates="members")
+
+# 验证码表
+class VerificationCode(Base):
+    __tablename__ = "verification_codes"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    email = Column(String, nullable=False, index=True)
+    code = Column(String, nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    expires_at = Column(DateTime, nullable=False)
+    is_used = Column(Boolean, default=False)
 
 # 创建所有表
 def init_db():

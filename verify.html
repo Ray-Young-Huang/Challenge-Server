@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>邮箱验证</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 50px;
+            width: 100%;
+            max-width: 500px;
+            text-align: center;
+        }
+
+        .icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 28px;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        .email-display {
+            background: #f0f0f0;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            color: #667eea;
+            font-weight: 600;
+            word-break: break-all;
+        }
+
+        .code-input-container {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        .code-input {
+            width: 50px;
+            height: 60px;
+            font-size: 24px;
+            text-align: center;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .code-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .code-input.filled {
+            border-color: #667eea;
+            background-color: #f0f4ff;
+        }
+
+        .timer {
+            color: #666;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .timer.warning {
+            color: #ff6b6b;
+            font-weight: 600;
+        }
+
+        .submit-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.3s ease;
+            margin-bottom: 15px;
+        }
+
+        .submit-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .tips {
+            margin-top: 30px;
+            padding: 15px;
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            border-radius: 4px;
+            text-align: left;
+        }
+
+        .tips p {
+            color: #856404;
+            font-size: 13px;
+            margin: 5px 0;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 30px 20px;
+            }
+
+            .code-input {
+                width: 45px;
+                height: 55px;
+                font-size: 22px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="icon">✉️</div>
+        <h1>验证您的邮箱</h1>
+        <p class="subtitle">我们已向您的邮箱发送了一封包含验证码的邮件</p>
+        
+        <div class="email-display" id="emailDisplay"></div>
+        
+        <form id="verifyForm">
+            <div class="code-input-container">
+                <input type="text" class="code-input" maxlength="1" id="code1" autocomplete="off">
+                <input type="text" class="code-input" maxlength="1" id="code2" autocomplete="off">
+                <input type="text" class="code-input" maxlength="1" id="code3" autocomplete="off">
+                <input type="text" class="code-input" maxlength="1" id="code4" autocomplete="off">
+                <input type="text" class="code-input" maxlength="1" id="code5" autocomplete="off">
+                <input type="text" class="code-input" maxlength="1" id="code6" autocomplete="off">
+            </div>
+            
+            <div class="timer" id="timer">验证码有效期：10:00</div>
+            
+            <button type="submit" class="submit-btn" id="submitBtn">验证并完成注册</button>
+        </form>
+        
+        <div class="tips">
+            <p>💡 <strong>提示：</strong></p>
+            <p>• 请检查您的邮箱收件箱或垃圾邮件文件夹</p>
+            <p>• 验证码有效期为10分钟</p>
+        </div>
+    </div>
+
+    <script>
+        // 获取URL参数中的邮箱
+        const urlParams = new URLSearchParams(window.location.search);
+        const email = urlParams.get('email');
+        
+        if (!email) {
+            alert('缺少邮箱信息，请重新注册');
+            window.location.href = '/register';
+        }
+        
+        document.getElementById('emailDisplay').textContent = email;
+        
+        // 验证码输入框自动聚焦和跳转
+        const codeInputs = document.querySelectorAll('.code-input');
+        
+        codeInputs.forEach((input, index) => {
+            // 输入时自动跳转到下一个
+            input.addEventListener('input', (e) => {
+                const value = e.target.value;
+                
+                // 只允许数字
+                if (!/^\d*$/.test(value)) {
+                    e.target.value = '';
+                    return;
+                }
+                
+                if (value) {
+                    e.target.classList.add('filled');
+                    // 自动跳转到下一个输入框
+                    if (index < codeInputs.length - 1) {
+                        codeInputs[index + 1].focus();
+                    }
+                } else {
+                    e.target.classList.remove('filled');
+                }
+            });
+            
+            // 退格键跳转到上一个
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Backspace' && !e.target.value && index > 0) {
+                    codeInputs[index - 1].focus();
+                }
+            });
+            
+            // 粘贴处理
+            input.addEventListener('paste', (e) => {
+                e.preventDefault();
+                const pastedData = e.clipboardData.getData('text').replace(/\D/g, '');
+                
+                for (let i = 0; i < Math.min(pastedData.length, 6); i++) {
+                    if (index + i < codeInputs.length) {
+                        codeInputs[index + i].value = pastedData[i];
+                        codeInputs[index + i].classList.add('filled');
+                    }
+                }
+                
+                // 聚焦到下一个空输入框或最后一个
+                const nextEmptyIndex = Array.from(codeInputs).findIndex(input => !input.value);
+                if (nextEmptyIndex !== -1) {
+                    codeInputs[nextEmptyIndex].focus();
+                } else {
+                    codeInputs[codeInputs.length - 1].focus();
+                }
+            });
+        });
+        
+        // 自动聚焦第一个输入框
+        codeInputs[0].focus();
+        
+        // 倒计时功能
+        let timeLeft = 600; // 10分钟
+        const timerElement = document.getElementById('timer');
+        
+        const timerInterval = setInterval(() => {
+            timeLeft--;
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            timerElement.textContent = `验证码有效期：${minutes}:${seconds.toString().padStart(2, '0')}`;
+            
+            if (timeLeft <= 60) {
+                timerElement.classList.add('warning');
+            }
+            
+            if (timeLeft <= 0) {
+                clearInterval(timerInterval);
+                timerElement.textContent = '验证码已过期';
+                document.getElementById('submitBtn').disabled = true;
+                alert('验证码已过期，请重新注册');
+            }
+        }, 1000);
+        
+        // 表单提交
+        document.getElementById('verifyForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            // 收集验证码
+            const code = Array.from(codeInputs).map(input => input.value).join('');
+            
+            if (code.length !== 6) {
+                alert('请输入完整的6位验证码');
+                return;
+            }
+            
+            // 提交验证
+            try {
+                const response = await fetch('/api/verify', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        email: email,
+                        code: code
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(result.detail || '验证失败');
+                }
+                
+                // 验证成功
+                clearInterval(timerInterval);
+                
+                alert('🎉 注册成功！\n\n团队名称：' + result.data.teamName + '\n用户名：' + result.data.username);
+                
+                // 跳转到登录页或首页
+                window.location.href = '/register'; // 可以改为登录页
+                
+            } catch (error) {
+                console.error('验证错误:', error);
+                alert('验证失败：' + error.message);
+                
+                // 清空输入框
+                codeInputs.forEach(input => {
+                    input.value = '';
+                    input.classList.remove('filled');
+                });
+                codeInputs[0].focus();
+            }
+        });
+    </script>
+</body>
+</html>
